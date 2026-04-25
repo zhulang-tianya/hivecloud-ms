@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.hivecloud</groupId>
+        <artifactId>hivecloud-ms</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hivecloud-plugins</artifactId>
+    <packaging>pom</packaging>
+
+    <name>HiveCloud Plugins</name>
+    <description>插件库</description>
+
+    <modules>
+        <module>hivecloud-plugin-auth</module>
+        <module>hivecloud-plugin-log</module>
+        <module>hivecloud-plugin-dict</module>
+        <module>hivecloud-plugin-cache</module>
+        <module>hivecloud-plugin-file</module>
+        <module>hivecloud-plugin-job</module>
+        <module>hivecloud-plugin-doc</module>
+        <module>hivecloud-plugin-ai</module>
+        <module>hivecloud-plugin-encrypt</module>
+        <module>hivecloud-plugin-message</module>
+    </modules>
+</project>

@@ -1,0 +1,2 @@
+com.hivecloud.plugin.auth.config.SecurityConfig
+com.hivecloud.plugin.auth.config.AuthAutoConfiguration

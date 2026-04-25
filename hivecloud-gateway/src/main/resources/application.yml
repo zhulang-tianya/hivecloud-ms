@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: hivecloud-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: system
+          uri: lb://hivecloud-system
+          predicates:
+            - Path=/api/system/**
+          filters:
+            - StripPrefix=1
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
+hivecloud:
+  gateway:
+    jwt:
+      secret: hivecloud-secret-key-must-be-at-least-32-chars
+      permit-all:
+        - /api/system/v1/login
+        - /api/system/v1/register
