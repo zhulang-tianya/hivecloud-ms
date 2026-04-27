@@ -14,11 +14,32 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * 网关全局异常处理器
+ * 统一处理网关层的各类异常，返回标准化 JSON 错误响应
+ * 支持 ResponseStatusException 和普通异常的处理
+ * 实现接口：ErrorWebExceptionHandler
+ *
+ * @author HiveCloud Team
+ * @date 2026-04-25
+ * @see ErrorWebExceptionHandler
+ * @see ResponseStatusException
+ */
 @Slf4j
 @Order(-1)
 @Component
 public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
+    /**
+     * 处理网关异常
+     * 1. 检查响应是否已提交
+     * 2. 根据异常类型设置状态码和消息
+     * 3. 返回统一的 JSON 格式错误响应
+     *
+     * @param exchange 服务器 Web 交换对象
+     * @param ex 异常对象
+     * @return Mono 空响应
+     */
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
