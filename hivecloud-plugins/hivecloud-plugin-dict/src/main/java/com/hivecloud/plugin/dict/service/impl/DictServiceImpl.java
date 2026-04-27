@@ -10,6 +10,7 @@ import com.hivecloud.plugin.dict.mapper.DictTypeMapper;
 import com.hivecloud.plugin.dict.service.DictService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(rollbackFor = Exception.class)
 public class DictServiceImpl extends ServiceImpl<DictDataMapper, DictData> implements DictService {
 
     private final DictTypeMapper dictTypeMapper;

@@ -8,6 +8,7 @@ import com.hivecloud.system.service.SysUserService;
 import com.hivecloud.system.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,16 +27,19 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(rollbackFor = Exception.class)
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
     /**
      * 获取用户详细信息
      * 使用 MapStruct 映射器将 SysUser 实体转换为 UserVO 视图对象
+     * 只读操作，使用 readOnly = true 优化性能
      *
      * @param userId 用户主键 ID
      * @return 用户视图对象，用户不存在时返回 null
      */
     @Override
+    @Transactional(readOnly = true)
     public UserVO getUserInfo(Long userId) {
         SysUser user = getById(userId);
         if (user == null) {

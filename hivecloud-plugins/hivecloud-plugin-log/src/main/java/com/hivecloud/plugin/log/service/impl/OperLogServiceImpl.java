@@ -8,9 +8,11 @@ import com.hivecloud.plugin.log.entity.SysOperLog;
 import com.hivecloud.plugin.log.mapper.OperLogMapper;
 import com.hivecloud.plugin.log.service.OperLogService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class OperLogServiceImpl extends ServiceImpl<OperLogMapper, SysOperLog> implements OperLogService {
 
     @Override

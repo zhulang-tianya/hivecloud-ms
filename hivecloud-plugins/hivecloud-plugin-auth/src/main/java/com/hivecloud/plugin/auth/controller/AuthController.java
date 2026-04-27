@@ -1,10 +1,13 @@
 package com.hivecloud.plugin.auth.controller;
 
+import com.hivecloud.common.core.annotation.Idempotent;
 import com.hivecloud.common.core.result.Result;
 import com.hivecloud.plugin.auth.service.AuthService;
 import com.hivecloud.plugin.auth.vo.LoginVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,12 +54,16 @@ public class AuthController {
 
     /**
      * 用户登出
+     * 幂等接口，防止重复登出导致的问题
      *
      * @return 操作结果
      */
+    @Idempotent(key = "'auth:logout:' + #request.remoteAddr", expire = 60)
     @PostMapping("/logout")
     public Result<Void> logout() {
         log.info("用户登出请求");
+        // 清除安全上下文
+        SecurityContextHolder.clearContext();
         return Result.success();
     }
 }

@@ -1,5 +1,6 @@
 package com.hivecloud.plugin.dict.controller;
 
+import com.hivecloud.common.core.annotation.Idempotent;
 import com.hivecloud.common.core.result.Result;
 import com.hivecloud.plugin.dict.entity.DictData;
 import com.hivecloud.plugin.dict.entity.DictType;
@@ -70,9 +71,11 @@ public class DictController {
 
     /**
      * 刷新字典缓存
+     * 幂等接口，防止重复刷新导致缓存抖动
      *
      * @return 操作结果
      */
+    @Idempotent(key = "'dict:refresh:' + T(java.lang.System).currentTimeMillis() / 60000", expire = 60)
     @PostMapping("/refresh")
     public Result<Void> refreshCache() {
         log.info("刷新字典缓存");
