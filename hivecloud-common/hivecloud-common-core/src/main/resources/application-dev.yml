@@ -4,6 +4,13 @@ spring:
     url: jdbc:mysql://${mysql.host:localhost}:${mysql.port:3306}/hivecloud?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: root
+    hikari:
+      maximum-pool-size: 20        # 最大连接数
+      minimum-idle: 5              # 最小空闲连接
+      connection-timeout: 30000    # 连接超时 30s
+      idle-timeout: 600000         # 空闲超时 10min
+      max-lifetime: 1800000        # 最大生命周期 30min
+      connection-test-query: SELECT 1
 
   data:
     redis:
@@ -14,10 +21,10 @@ spring:
       timeout: 3000ms
       lettuce:
         pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
-          max-wait: -1ms
+          max-active: 16           # 最大连接数
+          max-idle: 8              # 最大空闲连接
+          min-idle: 2              # 最小空闲连接
+          max-wait: 1000ms         # 获取连接超时 1s
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
