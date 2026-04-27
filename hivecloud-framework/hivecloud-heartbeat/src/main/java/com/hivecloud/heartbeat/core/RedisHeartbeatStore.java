@@ -23,21 +23,37 @@ import java.util.concurrent.TimeUnit;
 public class RedisHeartbeatStore implements HeartbeatStore {
 
     /**
-     * Redis 模板，用于操作 Redis 存储
+     * Redis Key 前缀：心跳检测模块
+     * 统一使用 hivecloud:heartbeat: 前缀
      */
-    private final RedisTemplate<String, Object> redisTemplate;
-
+    private static final String HEARTBEAT_PREFIX = "hivecloud:heartbeat:";
+    
     /**
-     * 心跳 Key 前缀
+     * 心跳 Key 模板
      * 格式：hivecloud:heartbeat:{instanceId}
      */
-    private static final String HEARTBEAT_KEY_PREFIX = "hivecloud:heartbeat:";
+    private static final String HEARTBEAT_KEY_TEMPLATE = HEARTBEAT_PREFIX + "{instanceId}";
 
     /**
      * 心跳过期时间（秒），默认 30 秒
      * 超过 30 秒未更新心跳的实例将被视为故障
      */
     private static final long HEARTBEAT_TTL_SECONDS = 30;
+
+    /**
+     * Redis 模板，用于操作 Redis 存储
+     */
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    /**
+     * 构建心跳 Key
+     *
+     * @param instanceId 实例 ID
+     * @return 格式化的 Key
+     */
+    private String buildHeartbeatKey(String instanceId) {
+        return HEARTBEAT_KEY_TEMPLATE.replace("{instanceId}", instanceId);
+    }
 
     /**
      * 保存心跳信息
@@ -47,7 +63,7 @@ public class RedisHeartbeatStore implements HeartbeatStore {
      */
     @Override
     public void saveHeartbeat(HeartbeatInfo heartbeatInfo) {
-        String key = HEARTBEAT_KEY_PREFIX + heartbeatInfo.getInstanceId();
+        String key = buildHeartbeatKey(heartbeatInfo.getInstanceId());
         heartbeatInfo.setLastHeartbeat(LocalDateTime.now());
         redisTemplate.opsForValue().set(key, heartbeatInfo, HEARTBEAT_TTL_SECONDS, TimeUnit.SECONDS);
     }
@@ -60,7 +76,7 @@ public class RedisHeartbeatStore implements HeartbeatStore {
      */
     @Override
     public HeartbeatInfo getHeartbeat(String instanceId) {
-        String key = HEARTBEAT_KEY_PREFIX + instanceId;
+        String key = buildHeartbeatKey(instanceId);
         Object value = redisTemplate.opsForValue().get(key);
         if (value instanceof HeartbeatInfo) {
             return (HeartbeatInfo) value;
@@ -75,7 +91,7 @@ public class RedisHeartbeatStore implements HeartbeatStore {
      */
     @Override
     public void removeHeartbeat(String instanceId) {
-        String key = HEARTBEAT_KEY_PREFIX + instanceId;
+        String key = buildHeartbeatKey(instanceId);
         redisTemplate.delete(key);
     }
 
