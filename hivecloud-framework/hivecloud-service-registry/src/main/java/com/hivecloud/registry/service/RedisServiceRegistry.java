@@ -26,21 +26,56 @@ import java.util.stream.Collectors;
 public class RedisServiceRegistry implements ServiceRegistry {
 
     /**
-     * 服务元数据 Key 前缀
-     * 格式：hivecloud:service:meta:{serviceId}:{instanceId}
+     * Redis Key 前缀：服务注册与发现模块
+     * 统一使用 hivecloud:registry: 前缀
      */
-    private static final String SERVICE_META_KEY = "hivecloud:service:meta:";
+    private static final String REGISTRY_PREFIX = "hivecloud:registry:";
     
     /**
-     * 服务集合 Key
-     * 格式：hivecloud:service:set
+     * 服务元数据 Key 模板
+     * 格式：hivecloud:registry:meta:{serviceId}:{instanceId}
      */
-    private static final String SERVICE_SET_KEY = "hivecloud:service:set";
+    private static final String SERVICE_META_KEY_TEMPLATE = REGISTRY_PREFIX + "meta:{serviceId}:{instanceId}";
+    
+    /**
+     * 服务集合 Key 模板
+     * 格式：hivecloud:registry:set:{serviceId}
+     */
+    private static final String SERVICE_SET_KEY_TEMPLATE = REGISTRY_PREFIX + "set:{serviceId}";
+    
+    /**
+     * 全局服务集合 Key
+     * 格式：hivecloud:registry:set
+     */
+    private static final String GLOBAL_SERVICE_SET_KEY = REGISTRY_PREFIX + "set";
 
     /**
      * Redis 模板，用于操作 Redis 存储
      */
     private final RedisTemplate<String, Object> redisTemplate;
+
+    /**
+     * 构建服务元数据 Key
+     *
+     * @param serviceId 服务 ID
+     * @param instanceId 实例 ID
+     * @return 格式化的 Key
+     */
+    private String buildServiceMetaKey(String serviceId, String instanceId) {
+        return SERVICE_META_KEY_TEMPLATE
+                .replace("{serviceId}", serviceId)
+                .replace("{instanceId}", instanceId);
+    }
+
+    /**
+     * 构建服务集合 Key
+     *
+     * @param serviceId 服务 ID
+     * @return 格式化的 Key
+     */
+    private String buildServiceSetKey(String serviceId) {
+        return SERVICE_SET_KEY_TEMPLATE.replace("{serviceId}", serviceId);
+    }
 
     /**
      * 注册服务实例
@@ -50,12 +85,14 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public void register(ServiceInstance instance) {
-        String metaKey = SERVICE_META_KEY + instance.getServiceId() + ":" + instance.getInstanceId();
+        String metaKey = buildServiceMetaKey(instance.getServiceId(), instance.getInstanceId());
+        String setKey = buildServiceSetKey(instance.getServiceId());
         instance.setRegisterTime(System.currentTimeMillis());
         instance.setLastHeartbeatTime(System.currentTimeMillis());
         instance.setStatus(ServiceStatus.UP);
         redisTemplate.opsForValue().set(metaKey, instance);
-        redisTemplate.opsForSet().add(SERVICE_SET_KEY, instance.getServiceId());
+        redisTemplate.opsForSet().add(setKey, instance.getInstanceId());
+        redisTemplate.opsForSet().add(GLOBAL_SERVICE_SET_KEY, instance.getServiceId());
         log.info("Service registered: {} ({})", instance.getServiceId(), instance.getInstanceId());
     }
 
@@ -68,11 +105,13 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public void deregister(String serviceId, String instanceId) {
-        String metaKey = SERVICE_META_KEY + serviceId + ":" + instanceId;
+        String metaKey = buildServiceMetaKey(serviceId, instanceId);
+        String setKey = buildServiceSetKey(serviceId);
         redisTemplate.delete(metaKey);
-        Long size = redisTemplate.opsForSet().size(SERVICE_SET_KEY + serviceId);
+        redisTemplate.opsForSet().remove(setKey, instanceId);
+        Long size = redisTemplate.opsForSet().size(setKey);
         if (size == null || size == 0) {
-            redisTemplate.opsForSet().remove(SERVICE_SET_KEY, serviceId);
+            redisTemplate.opsForSet().remove(GLOBAL_SERVICE_SET_KEY, serviceId);
         }
         log.info("Service deregistered: {} ({})", serviceId, instanceId);
     }
@@ -87,7 +126,7 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public void updateStatus(String serviceId, String instanceId, ServiceStatus status) {
-        String metaKey = SERVICE_META_KEY + serviceId + ":" + instanceId;
+        String metaKey = buildServiceMetaKey(serviceId, instanceId);
         ServiceInstance instance = (ServiceInstance) redisTemplate.opsForValue().get(metaKey);
         if (instance != null) {
             instance.setStatus(status);
@@ -105,7 +144,7 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public ServiceInstance getInstance(String serviceId, String instanceId) {
-        String metaKey = SERVICE_META_KEY + serviceId + ":" + instanceId;
+        String metaKey = buildServiceMetaKey(serviceId, instanceId);
         return (ServiceInstance) redisTemplate.opsForValue().get(metaKey);
     }
 
@@ -117,7 +156,8 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public List<ServiceInstance> getInstances(String serviceId) {
-        Set<Object> members = redisTemplate.opsForSet().members(SERVICE_SET_KEY + serviceId);
+        String setKey = buildServiceSetKey(serviceId);
+        Set<Object> members = redisTemplate.opsForSet().members(setKey);
         if (members == null || members.isEmpty()) {
             return Collections.emptyList();
         }
@@ -134,7 +174,7 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public List<String> getServiceNames() {
-        Set<Object> members = redisTemplate.opsForSet().members(SERVICE_SET_KEY);
+        Set<Object> members = redisTemplate.opsForSet().members(GLOBAL_SERVICE_SET_KEY);
         if (members == null) {
             return Collections.emptyList();
         }
@@ -150,7 +190,7 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public boolean exists(String serviceId, String instanceId) {
-        String metaKey = SERVICE_META_KEY + serviceId + ":" + instanceId;
+        String metaKey = buildServiceMetaKey(serviceId, instanceId);
         return Boolean.TRUE.equals(redisTemplate.hasKey(metaKey));
     }
 }
