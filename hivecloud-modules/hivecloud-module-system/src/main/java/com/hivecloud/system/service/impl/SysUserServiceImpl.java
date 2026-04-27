@@ -3,6 +3,7 @@ package com.hivecloud.system.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hivecloud.system.entity.SysUser;
 import com.hivecloud.system.mapper.SysUserMapper;
+import com.hivecloud.system.mapper.UserMapper;
 import com.hivecloud.system.service.SysUserService;
 import com.hivecloud.system.vo.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     /**
      * 获取用户详细信息
-     * 将 SysUser 实体转换为 UserVO 视图对象
+     * 使用 MapStruct 映射器将 SysUser 实体转换为 UserVO 视图对象
      *
      * @param userId 用户主键 ID
      * @return 用户视图对象，用户不存在时返回 null
@@ -40,17 +41,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (user == null) {
             return null;
         }
-        UserVO vo = new UserVO();
-        vo.setId(user.getId());
-        vo.setUsername(user.getUsername());
-        vo.setNickname(user.getNickname());
-        vo.setEmail(user.getEmail());
-        vo.setPhone(user.getPhone());
-        vo.setAvatar(user.getAvatar());
-        vo.setGender(user.getGender());
-        vo.setStatus(user.getStatus());
-        vo.setCreateTime(user.getCreateTime());
-        return vo;
+        return UserMapper.INSTANCE.toVO(user);
     }
 
     /**
