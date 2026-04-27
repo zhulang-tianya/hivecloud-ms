@@ -41,10 +41,26 @@ public class RedisNodeDiscovery implements NodeDiscovery {
     private final GossipProperties properties;
 
     /**
-     * 节点 Key 前缀
+     * Redis Key 前缀：Gossip 节点发现模块
+     * 统一使用 hivecloud:gossip: 前缀
+     */
+    private static final String GOSSIP_PREFIX = "hivecloud:gossip:";
+    
+    /**
+     * 节点 Key 模板
      * 格式：hivecloud:gossip:nodes:{nodeId}
      */
-    private static final String NODE_KEY_PREFIX = "hivecloud:gossip:nodes:";
+    private static final String NODE_KEY_TEMPLATE = GOSSIP_PREFIX + "nodes:{nodeId}";
+
+    /**
+     * 构建节点 Key
+     *
+     * @param nodeId 节点 ID
+     * @return 格式化的 Key
+     */
+    private String buildNodeKey(String nodeId) {
+        return NODE_KEY_TEMPLATE.replace("{nodeId}", nodeId);
+    }
 
     /**
      * 构造函数
@@ -65,7 +81,7 @@ public class RedisNodeDiscovery implements NodeDiscovery {
      */
     @Override
     public void registerNode(GossipNode node) {
-        String key = NODE_KEY_PREFIX + node.getNodeId();
+        String key = buildNodeKey(node.getNodeId());
         redisTemplate.opsForValue().set(key, node, properties.getNodeTtlSeconds(), TimeUnit.SECONDS);
         log.info("Node registered: {}", node.getNodeId());
     }
@@ -78,9 +94,25 @@ public class RedisNodeDiscovery implements NodeDiscovery {
      */
     @Override
     public void removeNode(String nodeId) {
-        String key = NODE_KEY_PREFIX + nodeId;
+        String key = buildNodeKey(nodeId);
         redisTemplate.delete(key);
         log.info("Node removed: {}", nodeId);
+    }
+
+    /**
+     * 获取节点信息
+     *
+     * @param nodeId 节点 ID
+     * @return Gossip 节点对象，不存在时返回 null
+     */
+    @Override
+    public GossipNode getNode(String nodeId) {
+        String key = buildNodeKey(nodeId);
+        Object value = redisTemplate.opsForValue().get(key);
+        if (value instanceof GossipNode) {
+            return (GossipNode) value;
+        }
+        return null;
     }
 
     /**
