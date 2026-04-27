@@ -10,28 +10,62 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 字典管理控制器
+ * 提供字典类型、字典数据的查询接口
+ * 支持刷新字典缓存功能
+ *
+ * @author HiveCloud Team
+ * @date 2026-04-25
+ * @see DictService
+ * @see Result
+ */
 @RestController
 @RequestMapping("/system/v1/dict")
 @RequiredArgsConstructor
 public class DictController {
 
+    /**
+     * 字典服务接口
+     */
     private final DictService dictService;
 
+    /**
+     * 获取字典类型列表
+     *
+     * @return 字典类型列表
+     */
     @GetMapping("/types")
     public Result<List<DictType>> getDictTypes() {
         return Result.success(dictService.getDictTypes());
     }
 
+    /**
+     * 根据字典编码获取字典数据
+     *
+     * @param dictCode 字典编码
+     * @return 字典数据列表
+     */
     @GetMapping("/data/{dictCode}")
     public Result<List<DictData>> getDictData(@PathVariable String dictCode) {
         return Result.success(dictService.getDictDataByCode(dictCode));
     }
 
+    /**
+     * 获取所有字典数据
+     *
+     * @return 所有字典数据（按字典编码分组）
+     */
     @GetMapping("/data/all")
     public Result<Map<String, List<DictData>>> getAllDictData() {
         return Result.success(dictService.getAllDictData());
     }
 
+    /**
+     * 刷新字典缓存
+     *
+     * @return 操作结果
+     */
     @PostMapping("/refresh")
     public Result<Void> refreshCache() {
         dictService.refreshCache();
