@@ -41,3 +41,7 @@ logs/
 # Test coverage
 coverage/
 *.exec
+
+# Documentation
+docs/progress/*.tmp
+docs/*.tmp
