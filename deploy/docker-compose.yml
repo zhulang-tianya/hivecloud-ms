@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hivecloud-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: hivecloud
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      - hivecloud-network
+
+  redis:
+    image: redis:6.0
+    container_name: hivecloud-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - hivecloud-network
+
+  hivecloud-ms:
+    build: .
+    container_name: hivecloud-ms
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hivecloud?useSSL=false
+      SPRING_REDIS_HOST: redis
+    networks:
+      - hivecloud-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hivecloud-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - hivecloud-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hivecloud-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    networks:
+      - hivecloud-network
+
+networks:
+  hivecloud-network:
+    driver: bridge

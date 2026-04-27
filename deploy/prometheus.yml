@@ -1,0 +1,27 @@
+# Prometheus 监控配置
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'hivecloud-ms'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'hivecloud-gateway'
+    static_configs:
+      - targets: ['localhost:8081']
+
+  - job_name: 'hivecloud-system'
+    static_configs:
+      - targets: ['localhost:8082']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']
+
+rule_files:
+  - 'alerts.yml'
