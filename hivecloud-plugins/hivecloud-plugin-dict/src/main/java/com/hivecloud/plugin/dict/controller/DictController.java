@@ -5,8 +5,11 @@ import com.hivecloud.plugin.dict.entity.DictData;
 import com.hivecloud.plugin.dict.entity.DictType;
 import com.hivecloud.plugin.dict.service.DictService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -20,8 +23,10 @@ import java.util.Map;
  * @see DictService
  * @see Result
  */
+@Slf4j
 @RestController
 @RequestMapping("/system/v1/dict")
+@Validated
 @RequiredArgsConstructor
 public class DictController {
 
@@ -43,11 +48,12 @@ public class DictController {
     /**
      * 根据字典编码获取字典数据
      *
-     * @param dictCode 字典编码
+     * @param dictCode 字典编码，不能为空
      * @return 字典数据列表
      */
     @GetMapping("/data/{dictCode}")
-    public Result<List<DictData>> getDictData(@PathVariable String dictCode) {
+    public Result<List<DictData>> getDictData(@PathVariable("dictCode") @NotBlank(message = "字典编码不能为空") String dictCode) {
+        log.info("查询字典数据，dictCode:{}", dictCode);
         return Result.success(dictService.getDictDataByCode(dictCode));
     }
 
@@ -58,6 +64,7 @@ public class DictController {
      */
     @GetMapping("/data/all")
     public Result<Map<String, List<DictData>>> getAllDictData() {
+        log.info("查询所有字典数据");
         return Result.success(dictService.getAllDictData());
     }
 
@@ -68,6 +75,7 @@ public class DictController {
      */
     @PostMapping("/refresh")
     public Result<Void> refreshCache() {
+        log.info("刷新字典缓存");
         dictService.refreshCache();
         return Result.success();
     }
