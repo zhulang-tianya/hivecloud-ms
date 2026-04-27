@@ -35,9 +35,16 @@ docs/
 - 架构评估报告
 - 架构设计决策
 - 技术选型文档
+- 部署架构图
+- 服务调用流程图
 
 **当前文档**:
 - [ARCHITECTURE-ASSESSMENT.md](./architecture/ARCHITECTURE-ASSESSMENT.md) - 架构评估报告
+- [DEVELOPMENT_PLAN.md](./architecture/DEVELOPMENT_PLAN.md) - 架构设计开发计划
+- [IMPLEMENTATION_REPORT.md](./architecture/IMPLEMENTATION_REPORT.md) - 项目实现分析报告
+- [hivecloud-architecture.html](./architecture/hivecloud-architecture.html) - 整体架构图（可视化）
+- [hivecloud-deployment.html](./architecture/hivecloud-deployment.html) - 部署架构图（可视化）
+- [hivecloud-service-flow.html](./architecture/hivecloud-service-flow.html) - 服务调用与数据流图（可视化）
 
 ---
 

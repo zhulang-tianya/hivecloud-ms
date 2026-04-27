@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiveCloud - 服务调用与数据流图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 40px;
+        }
+
+        .diagram-wrapper {
+            background: #020617;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow-x: auto;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HiveCloud 服务调用与数据流图</h1>
+        <div class="subtitle">Service Call Flow & Data Flow Diagram</div>
+        
+        <div class="diagram-wrapper">
+            <svg width="1600" height="1200" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                    </pattern>
+                    
+                    <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#06b6d4"/>
+                    </marker>
+                    <marker id="arrow-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/>
+                    </marker>
+                    <marker id="arrow-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
+                    </marker>
+                    <marker id="arrow-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#f59e0b"/>
+                    </marker>
+                </defs>
+
+                <rect width="1600" height="1200" fill="url(#grid)"/>
+
+                <text x="800" y="40" text-anchor="middle" fill="#38bdf8" font-size="28" font-weight="bold">HiveCloud 服务调用与数据流</text>
+                <text x="800" y="65" text-anchor="middle" fill="#94a3b8" font-size="14">客户端 → 网关 → 服务治理 → 业务服务 → 数据存储</text>
+
+                <!-- ==================== 客户端层 ==================== -->
+                <g id="client-layer">
+                    <rect x="50" y="100" width="1500" height="120" rx="12" fill="#0e7490" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="70" y="130" fill="#06b6d4" font-size="16" font-weight="bold">客户端层 (Client Layer)</text>
+                    
+                    <rect x="100" y="145" width="200" height="60" rx="8" fill="#155e75" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="200" y="180" text-anchor="middle" fill="#ffffff" font-size="14">Web 前端</text>
+                    
+                    <rect x="350" y="145" width="200" height="60" rx="8" fill="#155e75" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="450" y="180" text-anchor="middle" fill="#ffffff" font-size="14">移动端 APP</text>
+                    
+                    <rect x="600" y="145" width="200" height="60" rx="8" fill="#155e75" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="700" y="180" text-anchor="middle" fill="#ffffff" font-size="14">第三方系统</text>
+                    
+                    <rect x="850" y="145" width="200" height="60" rx="8" fill="#155e75" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="950" y="180" text-anchor="middle" fill="#ffffff" font-size="14">管理后台</text>
+                </g>
+
+                <!-- ==================== 网关层 ==================== -->
+                <g id="gateway-layer">
+                    <rect x="50" y="260" width="1500" height="120" rx="12" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="70" y="290" fill="#10b981" font-size="16" font-weight="bold">网关层 (Gateway Layer)</text>
+                    
+                    <rect x="100" y="305" width="350" height="60" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2"/>
+                    <text x="275" y="340" text-anchor="middle" fill="#ffffff" font-size="14">统一业务网关 (hivecloud-gateway)</text>
+                    
+                    <rect x="500" y="305" width="350" height="60" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2"/>
+                    <text x="675" y="340" text-anchor="middle" fill="#ffffff" font-size="14">鉴权 · 限流 · 路由 · 风控</text>
+                    
+                    <rect x="900" y="305" width="350" height="60" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2"/>
+                    <text x="1075" y="340" text-anchor="middle" fill="#ffffff" font-size="14">域内直连通道 (hivecloud-direct-connector)</text>
+                    
+                    <rect x="1300" y="305" width="200" height="60" rx="8" fill="#065f46" stroke="#10b981" stroke-width="2"/>
+                    <text x="1400" y="340" text-anchor="middle" fill="#ffffff" font-size="14">SSL 卸载</text>
+                </g>
+
+                <!-- ==================== 服务治理层 ==================== -->
+                <g id="governance-layer">
+                    <rect x="50" y="420" width="1500" height="180" rx="12" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="70" y="450" fill="#8b5cf6" font-size="16" font-weight="bold">服务治理层 (Service Governance Layer) - 去中心化嵌入每个服务节点</text>
+                    
+                    <rect x="100" y="470" width="250" height="110" rx="8" fill="#5b21b6" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="225" y="500" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">服务发现</text>
+                    <text x="225" y="520" text-anchor="middle" fill="#e9d5ff" font-size="11">本地缓存服务列表</text>
+                    <text x="225" y="540" text-anchor="middle" fill="#e9d5ff" font-size="11">Redis元数据查询</text>
+                    <text x="225" y="560" text-anchor="middle" fill="#e9d5ff" font-size="11">智能路由选择</text>
+                    
+                    <rect x="400" y="470" width="250" height="110" rx="8" fill="#5b21b6" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="525" y="500" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">心跳检测</text>
+                    <text x="525" y="520" text-anchor="middle" fill="#e9d5ff" font-size="11">1s心跳间隔</text>
+                    <text x="525" y="540" text-anchor="middle" fill="#e9d5ff" font-size="11">3s不健康标记</text>
+                    <text x="525" y="560" text-anchor="middle" fill="#e9d5ff" font-size="11">5s故障剔除</text>
+                    
+                    <rect x="700" y="470" width="250" height="110" rx="8" fill="#5b21b6" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="825" y="500" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">故障剔除</text>
+                    <text x="825" y="520" text-anchor="middle" fill="#e9d5ff" font-size="11">主动优雅下线</text>
+                    <text x="825" y="540" text-anchor="middle" fill="#e9d5ff" font-size="11">被动TTL剔除</text>
+                    <text x="825" y="560" text-anchor="middle" fill="#e9d5ff" font-size="11">调用故障兜底</text>
+                    
+                    <rect x="1000" y="470" width="250" height="110" rx="8" fill="#5b21b6" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="1125" y="500" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">集群同步</text>
+                    <text x="1125" y="520" text-anchor="middle" fill="#e9d5ff" font-size="11">Gossip协议</text>
+                    <text x="1125" y="540" text-anchor="middle" fill="#e9d5ff" font-size="11">3-5邻居节点</text>
+                    <text x="1125" y="560" text-anchor="middle" fill="#e9d5ff" font-size="11">同步延迟<1s</text>
+                    
+                    <rect x="1300" y="470" width="200" height="110" rx="8" fill="#5b21b6" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="1400" y="500" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">负载均衡</text>
+                    <text x="1400" y="520" text-anchor="middle" fill="#e9d5ff" font-size="11">轮询/权重</text>
+                    <text x="1400" y="540" text-anchor="middle" fill="#e9d5ff" font-size="11">最少连接</text>
+                    <text x="1400" y="560" text-anchor="middle" fill="#e9d5ff" font-size="11">故障节点跳过</text>
+                </g>
+
+                <!-- ==================== 业务服务层 ==================== -->
+                <g id="service-layer">
+                    <rect x="50" y="640" width="1500" height="240" rx="12" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="70" y="670" fill="#f59e0b" font-size="16" font-weight="bold">业务服务层 (Business Service Layer) - 模块化单体 + 独立微服务</text>
+                    
+                    <!-- 模块化单体 -->
+                    <rect x="100" y="690" width="350" height="80" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="275" y="720" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">模块化单体 (单一Jar)</text>
+                    <text x="275" y="745" text-anchor="middle" fill="#fef3c7" font-size="12">system · file · job</text>
+                    
+                    <!-- 独立微服务 -->
+                    <rect x="500" y="690" width="150" height="80" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="575" y="720" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">支付服务</text>
+                    <text x="575" y="745" text-anchor="middle" fill="#fef3c7" font-size="11">pay</text>
+                    
+                    <rect x="700" y="690" width="150" height="80" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="775" y="720" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">理赔服务</text>
+                    <text x="775" y="745" text-anchor="middle" fill="#fef3c7" font-size="11">claim</text>
+                    
+                    <rect x="900" y="690" width="150" height="80" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="975" y="720" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">活动服务</text>
+                    <text x="975" y="745" text-anchor="middle" fill="#fef3c7" font-size="11">activity</text>
+                    
+                    <rect x="1100" y="690" width="150" height="80" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="1175" y="720" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">通知服务</text>
+                    <text x="1175" y="745" text-anchor="middle" fill="#fef3c7" font-size="11">notice</text>
+                    
+                    <rect x="1300" y="690" width="200" height="80" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="1400" y="720" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">插件引擎</text>
+                    <text x="1400" y="745" text-anchor="middle" fill="#fef3c7" font-size="11">auth · log · dict · cache</text>
+                    
+                    <!-- 双轨链路 -->
+                    <rect x="100" y="800" width="400" height="60" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="300" y="835" text-anchor="middle" fill="#ffffff" font-size="13">双轨链路: 快轨(只读) @FastTrack | 稳轨(写事务) @StableTrack</text>
+                    
+                    <!-- 事件总线 -->
+                    <rect x="550" y="800" width="350" height="60" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="725" y="835" text-anchor="middle" fill="#ffffff" font-size="13">事件总线: 服务间异步通信 · 发布订阅</text>
+                    
+                    <!-- 熔断降级 -->
+                    <rect x="950" y="800" width="300" height="60" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="1100" y="835" text-anchor="middle" fill="#ffffff" font-size="13">熔断降级: 自动熔断 · 降级策略 · 故障隔离</text>
+                    
+                    <rect x="1300" y="800" width="200" height="60" rx="8" fill="#92400e" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="1400" y="835" text-anchor="middle" fill="#ffffff" font-size="13">本地缓存优先</text>
+                </g>
+
+                <!-- ==================== 数据存储层 ==================== -->
+                <g id="data-layer">
+                    <rect x="50" y="920" width="1500" height="160" rx="12" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="70" y="950" fill="#f43f5e" font-size="16" font-weight="bold">数据存储层 (Data Storage Layer)</text>
+                    
+                    <rect x="100" y="970" width="250" height="90" rx="8" fill="#9f1239" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="225" y="1000" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Caffeine 本地缓存</text>
+                    <text x="225" y="1025" text-anchor="middle" fill="#ffe4e6" font-size="11">服务列表 · 配置 · 高频数据</text>
+                    <text x="225" y="1045" text-anchor="middle" fill="#ffe4e6" font-size="11">响应时间: 1-5ms</text>
+                    
+                    <rect x="400" y="970" width="250" height="90" rx="8" fill="#9f1239" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="525" y="1000" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Redis 分布式缓存</text>
+                    <text x="525" y="1025" text-anchor="middle" fill="#ffe4e6" font-size="11">元数据 · 会话 · 限流 · 分布式锁</text>
+                    <text x="525" y="1045" text-anchor="middle" fill="#ffe4e6" font-size="11">TTL=6s · 每秒刷新</text>
+                    
+                    <rect x="700" y="970" width="250" height="90" rx="8" fill="#9f1239" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="825" y="1000" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">MySQL 数据库</text>
+                    <text x="825" y="1025" text-anchor="middle" fill="#ffe4e6" font-size="11">垂直分库 · 读写分离</text>
+                    <text x="825" y="1045" text-anchor="middle" fill="#ffe4e6" font-size="11">主从同步 · 数据备份</text>
+                    
+                    <rect x="1000" y="970" width="250" height="90" rx="8" fill="#9f1239" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="1125" y="1000" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Nacos 配置中心</text>
+                    <text x="1125" y="1025" text-anchor="middle" fill="#ffe4e6" font-size="11">动态配置 · 热更新</text>
+                    <text x="1125" y="1045" text-anchor="middle" fill="#ffe4e6" font-size="11">限流阈值 · 路由配置</text>
+                    
+                    <rect x="1300" y="970" width="200" height="90" rx="8" fill="#9f1239" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="1400" y="1000" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">数据自愈</text>
+                    <text x="1400" y="1025" text-anchor="middle" fill="#ffe4e6" font-size="11">缓存失效自动重建</text>
+                    <text x="1400" y="1045" text-anchor="middle" fill="#ffe4e6" font-size="11">本地优先降级</text>
+                </g>
+
+                <!-- ==================== 连接箭头 ==================== -->
+                <!-- 客户端 -> 网关 -->
+                <line x1="200" y1="220" x2="275" y2="305" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+                <line x1="450" y1="220" x2="675" y2="305" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+                <line x1="700" y1="220" x2="1075" y2="305" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+                <line x1="950" y1="220" x2="1400" y2="305" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+                
+                <!-- 网关 -> 服务治理 -->
+                <line x1="275" y1="365" x2="225" y2="470" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-emerald)"/>
+                <line x1="675" y1="365" x2="525" y2="470" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-emerald)"/>
+                <line x1="1075" y1="365" x2="825" y2="470" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-emerald)"/>
+                <line x1="1400" y1="365" x2="1125" y2="470" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-emerald)"/>
+                
+                <!-- 服务治理 -> 业务服务 -->
+                <line x1="225" y1="580" x2="275" y2="690" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                <line x1="525" y1="580" x2="575" y2="690" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                <line x1="825" y1="580" x2="775" y2="690" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                <line x1="1125" y1="580" x2="975" y2="690" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                <line x1="1400" y1="580" x2="1175" y2="690" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                
+                <!-- 业务服务 -> 数据存储 -->
+                <line x1="275" y1="860" x2="225" y2="970" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-amber)"/>
+                <line x1="575" y1="860" x2="525" y2="970" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-amber)"/>
+                <line x1="775" y1="860" x2="825" y2="970" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-amber)"/>
+                <line x1="975" y1="860" x2="1125" y2="970" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-amber)"/>
+                <line x1="1175" y1="860" x2="1400" y2="970" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-amber)"/>
+
+                <!-- 服务间调用 -->
+                <path d="M 650 730 Q 700 750 700 730" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                <path d="M 850 730 Q 900 750 900 730" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                <path d="M 1050 730 Q 1100 750 1100 730" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-violet)"/>
+                
+                <text x="675" y="760" text-anchor="middle" fill="#8b5cf6" font-size="11">服务间HTTP调用</text>
+                <text x="875" y="760" text-anchor="middle" fill="#8b5cf6" font-size="11">事件总线通信</text>
+                <text x="1075" y="760" text-anchor="middle" fill="#8b5cf6" font-size="11">插件调用</text>
+            </svg>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #06b6d4;"></div>
+                <span>客户端请求 (Cyan)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #10b981;"></div>
+                <span>网关转发 (Emerald)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #8b5cf6;"></div>
+                <span>服务治理 (Violet)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f59e0b;"></div>
+                <span>业务服务 (Amber)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f43f5e;"></div>
+                <span>数据存储 (Rose)</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>HiveCloud-MS | 服务调用与数据流图 | 去中心化治理 · 本地优先 · 自愈自治</p>
+            <p>技术栈: SpringBoot 3.x + SpringCloud Alibaba 精简版 + Redis + MySQL</p>
+        </div>
+    </div>
+</body>
+</html>

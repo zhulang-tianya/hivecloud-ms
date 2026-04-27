@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiveCloud 轻量微服务脚手架 - 完整架构设计图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 40px;
+        }
+
+        .diagram-wrapper {
+            background: #020617;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow-x: auto;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HiveCloud 轻量微服务脚手架</h1>
+        <div class="subtitle">HiveCloud Lightweight MicroService Scaffold - 完整架构设计图</div>
+        
+        <div class="diagram-wrapper">
+            <svg width="1600" height="1400" viewBox="0 0 1600 1400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- 网格背景 -->
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                    </pattern>
+                    
+                    <!-- 箭头标记 -->
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                    </marker>
+                    
+                    <!-- 渐变定义 -->
+                    <linearGradient id="layer1-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.3"/>
+                        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.1"/>
+                    </linearGradient>
+                    <linearGradient id="layer2-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.3"/>
+                        <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.1"/>
+                    </linearGradient>
+                    <linearGradient id="layer3-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3"/>
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.1"/>
+                    </linearGradient>
+                    <linearGradient id="layer4-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.3"/>
+                        <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.1"/>
+                    </linearGradient>
+                    <linearGradient id="layer5-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#f43f5e;stop-opacity:0.3"/>
+                        <stop offset="100%" style="stop-color:#f43f5e;stop-opacity:0.1"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- 网格背景 -->
+                <rect width="1600" height="1400" fill="url(#grid)"/>
+
+                <!-- 标题 -->
+                <text x="800" y="40" text-anchor="middle" fill="#38bdf8" font-size="28" font-weight="bold">HiveCloud 五层架构设计图</text>
+                <text x="800" y="65" text-anchor="middle" fill="#94a3b8" font-size="14">去中心化 · 轻量微服务 · 自愈自治 · 灵活扩展</text>
+
+                <!-- ==================== 第一层：双模流量接入层 ==================== -->
+                <g id="layer1">
+                    <rect x="50" y="100" width="1500" height="180" rx="12" fill="url(#layer1-grad)" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="70" y="130" fill="#06b6d4" font-size="18" font-weight="bold">L1 - 双模流量接入层 (Traffic Access Layer)</text>
+                    
+                    <!-- 统一业务网关 -->
+                    <rect x="100" y="150" width="350" height="110" rx="8" fill="#0e7490" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="275" y="180" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">统一业务网关</text>
+                    <text x="275" y="200" text-anchor="middle" fill="#cffafe" font-size="12">hivecloud-gateway</text>
+                    <text x="275" y="220" text-anchor="middle" fill="#cffafe" font-size="11">JWT鉴权 · 限流熔断 · 路由转发</text>
+                    <text x="275" y="240" text-anchor="middle" fill="#cffafe" font-size="11">风控防刷 · 跨域处理 · SSL卸载</text>
+
+                    <!-- 域内直连通道 -->
+                    <rect x="550" y="150" width="350" height="110" rx="8" fill="#0e7490" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="725" y="180" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">域内直连通道</text>
+                    <text x="725" y="200" text-anchor="middle" fill="#cffafe" font-size="12">hivecloud-direct-connector</text>
+                    <text x="725" y="220" text-anchor="middle" fill="#cffafe" font-size="11">HTTP直连 · OkHttp连接池</text>
+                    <text x="725" y="240" text-anchor="middle" fill="#cffafe" font-size="11">绕开网关 · 响应速度提升50%+</text>
+
+                    <!-- 流量分发 -->
+                    <rect x="1000" y="150" width="250" height="110" rx="8" fill="#0e7490" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="1125" y="180" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">流量分发引擎</text>
+                    <text x="1125" y="200" text-anchor="middle" fill="#cffafe" font-size="12">Traffic Dispatcher</text>
+                    <text x="1125" y="220" text-anchor="middle" fill="#cffafe" font-size="11">冷热流量拆分 · 快轨/稳轨路由</text>
+                    <text x="1125" y="240" text-anchor="middle" fill="#cffafe" font-size="11">动态限流 · 负载均衡</text>
+
+                    <!-- 连接箭头 -->
+                    <line x1="450" y1="205" x2="550" y2="205" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <line x1="900" y1="205" x2="1000" y2="205" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrowhead)"/>
+                </g>
+
+                <!-- ==================== 第二层：去中心化服务治理层 ==================== -->
+                <g id="layer2">
+                    <rect x="50" y="320" width="1500" height="280" rx="12" fill="url(#layer2-grad)" stroke="#10b981" stroke-width="2"/>
+                    <text x="70" y="350" fill="#10b981" font-size="18" font-weight="bold">L2 - 去中心化服务治理层 (Decentralized Service Governance Layer)</text>
+                    
+                    <!-- 轻量元数据注册 -->
+                    <rect x="100" y="370" width="300" height="100" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="250" y="400" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">轻量元数据注册</text>
+                    <text x="250" y="420" text-anchor="middle" fill="#d1fae5" font-size="12">hivecloud-service-registry</text>
+                    <text x="250" y="440" text-anchor="middle" fill="#d1fae5" font-size="11">Redis Hash存储 · TTL=6s</text>
+                    <text x="250" y="460" text-anchor="middle" fill="#d1fae5" font-size="11">服务元数据上报 · 本地缓存查询</text>
+
+                    <!-- 分布式心跳探测 -->
+                    <rect x="450" y="370" width="300" height="100" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="600" y="400" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">分布式心跳探测</text>
+                    <text x="600" y="420" text-anchor="middle" fill="#d1fae5" font-size="12">hivecloud-heartbeat</text>
+                    <text x="600" y="440" text-anchor="middle" fill="#d1fae5" font-size="11">1s心跳间隔 · 3s不健康阈值</text>
+                    <text x="600" y="460" text-anchor="middle" fill="#d1fae5" font-size="11">5s剔除阈值 · 本地健康状态维护</text>
+
+                    <!-- 故障剔除双机制 -->
+                    <rect x="800" y="370" width="350" height="100" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="975" y="400" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">故障剔除三重机制</text>
+                    <text x="975" y="420" text-anchor="middle" fill="#d1fae5" font-size="12">hivecloud-fault-remove</text>
+                    <text x="975" y="440" text-anchor="middle" fill="#d1fae5" font-size="11">策略1: 主动优雅下线 (@PreDestroy)</text>
+                    <text x="975" y="460" text-anchor="middle" fill="#d1fae5" font-size="11">策略2: 被动剔除 (TTL过期) · 策略3: 调用故障兜底</text>
+
+                    <!-- 轻量集群同步 -->
+                    <rect x="1200" y="370" width="300" height="100" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="1350" y="400" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">轻量集群同步</text>
+                    <text x="1350" y="420" text-anchor="middle" fill="#d1fae5" font-size="12">hivecloud-gossip-sync</text>
+                    <text x="1350" y="440" text-anchor="middle" fill="#d1fae5" font-size="11">Apache Gossip协议 · 3-5邻居节点</text>
+                    <text x="1350" y="460" text-anchor="middle" fill="#d1fae5" font-size="11">同步延迟<1s · 无广播风暴</text>
+
+                    <!-- 服务发现与路由 -->
+                    <rect x="100" y="500" width="350" height="80" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="275" y="530" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">服务发现与路由</text>
+                    <text x="275" y="550" text-anchor="middle" fill="#d1fae5" font-size="12">本地缓存服务列表 · 智能路由选择</text>
+
+                    <!-- 负载均衡 -->
+                    <rect x="500" y="500" width="250" height="80" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="625" y="530" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">负载均衡</text>
+                    <text x="625" y="550" text-anchor="middle" fill="#d1fae5" font-size="12">轮询 · 权重 · 最少连接</text>
+
+                    <!-- 熔断降级 -->
+                    <rect x="800" y="500" width="250" height="80" rx="8" fill="#047857" stroke="#10b981" stroke-width="2"/>
+                    <text x="925" y="530" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">熔断降级</text>
+                    <text x="925" y="550" text-anchor="middle" fill="#d1fae5" font-size="12">自动熔断 · 降级策略 · 故障隔离</text>
+
+                    <!-- 连接箭头 -->
+                    <line x1="400" y1="420" x2="450" y2="420" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <line x1="750" y1="420" x2="800" y2="420" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <line x1="1150" y1="420" x2="1200" y2="420" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)"/>
+                </g>
+
+                <!-- ==================== 第三层：业务内核运行层 ==================== -->
+                <g id="layer3">
+                    <rect x="50" y="640" width="1500" height="380" rx="12" fill="url(#layer3-grad)" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="70" y="670" fill="#8b5cf6" font-size="18" font-weight="bold">L3 - 业务内核运行层 (Business Core Runtime Layer)</text>
+                    
+                    <!-- 模块化单体 -->
+                    <rect x="100" y="690" width="400" height="140" rx="8" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="300" y="720" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">模块化单体</text>
+                    <text x="300" y="740" text-anchor="middle" fill="#e9d5ff" font-size="12">hivecloud-module-* (单一Jar包部署)</text>
+                    <text x="300" y="765" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-module-system (系统管理)</text>
+                    <text x="300" y="785" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-module-file (文件管理)</text>
+                    <text x="300" y="805" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-module-job (定时任务)</text>
+
+                    <!-- 独立微服务 -->
+                    <rect x="550" y="690" width="400" height="140" rx="8" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="750" y="720" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">独立微服务</text>
+                    <text x="750" y="740" text-anchor="middle" fill="#e9d5ff" font-size="12">hivecloud-service-* (独立Jar包部署)</text>
+                    <text x="750" y="765" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-service-pay (支付服务)</text>
+                    <text x="750" y="785" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-service-claim (理赔服务)</text>
+                    <text x="750" y="805" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-service-activity (活动服务)</text>
+                    <text x="750" y="825" text-anchor="middle" fill="#e9d5ff" font-size="11">• hivecloud-service-notice (通知服务)</text>
+
+                    <!-- 原子化插件引擎 -->
+                    <rect x="1000" y="690" width="500" height="140" rx="8" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="1250" y="720" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">原子化插件引擎</text>
+                    <text x="1250" y="740" text-anchor="middle" fill="#e9d5ff" font-size="12">hivecloud-plugin-engine (SPI标准接口)</text>
+                    <text x="1250" y="765" text-anchor="middle" fill="#e9d5ff" font-size="11">内置插件: auth · log · dict · cache</text>
+                    <text x="1250" y="785" text-anchor="middle" fill="#e9d5ff" font-size="11">扩展插件: ai · encrypt · message</text>
+                    <text x="1250" y="805" text-anchor="middle" fill="#e9d5ff" font-size="11">按需加载 · 自定义开发 · 热插拔</text>
+
+                    <!-- 双轨业务链路 -->
+                    <rect x="100" y="860" width="450" height="140" rx="8" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="325" y="890" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">双轨业务链路</text>
+                    <text x="325" y="910" text-anchor="middle" fill="#e9d5ff" font-size="12">hivecloud-business-link</text>
+                    <text x="325" y="935" text-anchor="middle" fill="#e9d5ff" font-size="11">快轨链路 (只读): @FastTrack</text>
+                    <text x="325" y="955" text-anchor="middle" fill="#e9d5ff" font-size="11">本地缓存+分布式缓存 · 响应1-5ms</text>
+                    <text x="325" y="975" text-anchor="middle" fill="#e9d5ff" font-size="11">稳轨链路 (写事务): @StableTrack</text>
+                    <text x="325" y="995" text-anchor="middle" fill="#e9d5ff" font-size="11">标准服务调用 · 事务控制 · 响应50-200ms</text>
+
+                    <!-- 事件总线 -->
+                    <rect x="600" y="860" width="350" height="140" rx="8" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="775" y="890" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">事件总线</text>
+                    <text x="775" y="910" text-anchor="middle" fill="#e9d5ff" font-size="12">hivecloud-event-bus</text>
+                    <text x="775" y="935" text-anchor="middle" fill="#e9d5ff" font-size="11">服务间异步通信 · 事件驱动</text>
+                    <text x="775" y="955" text-anchor="middle" fill="#e9d5ff" font-size="11">发布订阅模式 · 解耦服务依赖</text>
+                    <text x="775" y="975" text-anchor="middle" fill="#e9d5ff" font-size="11">支持本地事件 · 分布式事件</text>
+
+                    <!-- 混合部署切换 -->
+                    <rect x="1000" y="860" width="500" height="140" rx="8" fill="#6d28d9" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="1250" y="890" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">混合部署切换规则</text>
+                    <text x="1250" y="910" text-anchor="middle" fill="#e9d5ff" font-size="12">Deployment Switching</text>
+                    <text x="1250" y="935" text-anchor="middle" fill="#e9d5ff" font-size="11">业务初期: 模块化单体快速迭代</text>
+                    <text x="1250" y="955" text-anchor="middle" fill="#e9d5ff" font-size="11">并发增长: 按需拆分为独立微服务</text>
+                    <text x="1250" y="975" text-anchor="middle" fill="#e9d5ff" font-size="11">平滑过渡 · 无需重构架构</text>
+                    <text x="1250" y="995" text-anchor="middle" fill="#e9d5ff" font-size="11">故障域隔离 · 独立扩展</text>
+
+                    <!-- 连接箭头 -->
+                    <line x1="500" y1="760" x2="550" y2="760" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead)"/>
+                </g>
+
+                <!-- ==================== 第四层：数据自治管理层 ==================== -->
+                <g id="layer4">
+                    <rect x="50" y="1060" width="1500" height="180" rx="12" fill="url(#layer4-grad)" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="70" y="1090" fill="#f59e0b" font-size="18" font-weight="bold">L4 - 数据自治管理层 (Data自治 Management Layer)</text>
+                    
+                    <!-- 本地缓存 -->
+                    <rect x="100" y="1110" width="250" height="110" rx="8" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="225" y="1140" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">本地缓存</text>
+                    <text x="225" y="1160" text-anchor="middle" fill="#fef3c7" font-size="12">Caffeine</text>
+                    <text x="225" y="1180" text-anchor="middle" fill="#fef3c7" font-size="11">服务列表 · 配置信息</text>
+                    <text x="225" y="1200" text-anchor="middle" fill="#fef3c7" font-size="11">高频数据 · 路由列表</text>
+
+                    <!-- 分布式缓存 -->
+                    <rect x="400" y="1110" width="250" height="110" rx="8" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="525" y="1140" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">分布式缓存</text>
+                    <text x="525" y="1160" text-anchor="middle" fill="#fef3c7" font-size="12">Redis 6.x/7.x</text>
+                    <text x="525" y="1180" text-anchor="middle" fill="#fef3c7" font-size="11">元数据存储 · 会话共享</text>
+                    <text x="525" y="1200" text-anchor="middle" fill="#fef3c7" font-size="11">限流计数 · 分布式锁</text>
+
+                    <!-- 数据自愈 -->
+                    <rect x="700" y="1110" width="250" height="110" rx="8" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="825" y="1140" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">数据自愈</text>
+                    <text x="825" y="1160" text-anchor="middle" fill="#fef3c7" font-size="12">Cache Self-Healing</text>
+                    <text x="825" y="1180" text-anchor="middle" fill="#fef3c7" font-size="11">缓存失效自动重建</text>
+                    <text x="825" y="1200" text-anchor="middle" fill="#fef3c7" font-size="11">本地优先 · 降级策略</text>
+
+                    <!-- 数据持久化 -->
+                    <rect x="1000" y="1110" width="250" height="110" rx="8" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="1125" y="1140" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">数据持久化</text>
+                    <text x="1125" y="1160" text-anchor="middle" fill="#fef3c7" font-size="12">MySQL 5.7/8.0</text>
+                    <text x="1125" y="1180" text-anchor="middle" fill="#fef3c7" font-size="11">垂直分库 · 读写分离</text>
+                    <text x="1125" y="1200" text-anchor="middle" fill="#fef3c7" font-size="11">主从同步 · 数据备份</text>
+
+                    <!-- 连接箭头 -->
+                    <line x1="350" y1="1165" x2="400" y2="1165" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <line x1="650" y1="1165" x2="700" y2="1165" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <line x1="950" y1="1165" x2="1000" y2="1165" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+                </g>
+
+                <!-- ==================== 第五层：基础底座层 ==================== -->
+                <g id="layer5">
+                    <rect x="50" y="1280" width="1500" height="100" rx="12" fill="url(#layer5-grad)" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="70" y="1310" fill="#f43f5e" font-size="18" font-weight="bold">L5 - 基础底座层 (Foundation Layer)</text>
+                    
+                    <!-- 配置中心 -->
+                    <rect x="100" y="1320" width="200" height="50" rx="6" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="200" y="1350" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Nacos配置中心</text>
+
+                    <!-- 日志系统 -->
+                    <rect x="350" y="1320" width="200" height="50" rx="6" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="450" y="1350" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">日志系统</text>
+
+                    <!-- 监控告警 -->
+                    <rect x="600" y="1320" width="200" height="50" rx="6" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="700" y="1350" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">监控告警</text>
+
+                    <!-- 安全认证 -->
+                    <rect x="850" y="1320" width="200" height="50" rx="6" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="950" y="1350" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">安全认证</text>
+
+                    <!-- JDK运行时 -->
+                    <rect x="1100" y="1320" width="200" height="50" rx="6" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="1200" y="1350" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">JDK 17/21</text>
+
+                    <!-- SpringBoot -->
+                    <rect x="1350" y="1320" width="200" height="50" rx="6" fill="#be123c" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="1450" y="1350" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">SpringBoot 3.x</text>
+                </g>
+
+                <!-- ==================== 层间连接箭头 ==================== -->
+                <!-- L1 -> L2 -->
+                <line x1="800" y1="280" x2="800" y2="320" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+                <text x="820" y="305" fill="#94a3b8" font-size="12">流量路由</text>
+
+                <!-- L2 -> L3 -->
+                <line x1="800" y1="600" x2="800" y2="640" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+                <text x="820" y="625" fill="#94a3b8" font-size="12">服务治理</text>
+
+                <!-- L3 -> L4 -->
+                <line x1="800" y1="1020" x2="800" y2="1060" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+                <text x="820" y="1045" fill="#94a3b8" font-size="12">数据访问</text>
+
+                <!-- L4 -> L5 -->
+                <line x1="800" y1="1240" x2="800" y2="1280" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+                <text x="820" y="1265" fill="#94a3b8" font-size="12">基础依赖</text>
+
+                <!-- 侧边标注 -->
+                <text x="30" y="190" fill="#06b6d4" font-size="14" font-weight="bold" transform="rotate(-90, 30, 190)">流量接入</text>
+                <text x="30" y="460" fill="#10b981" font-size="14" font-weight="bold" transform="rotate(-90, 30, 460)">服务治理</text>
+                <text x="30" y="830" fill="#8b5cf6" font-size="14" font-weight="bold" transform="rotate(-90, 30, 830)">业务运行</text>
+                <text x="30" y="1150" fill="#f59e0b" font-size="14" font-weight="bold" transform="rotate(-90, 30, 1150)">数据管理</text>
+                <text x="30" y="1330" fill="#f43f5e" font-size="14" font-weight="bold" transform="rotate(-90, 30, 1330)">基础底座</text>
+            </svg>
+        </div>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #06b6d4;"></div>
+                <span>流量接入层 (Cyan)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #10b981;"></div>
+                <span>服务治理层 (Emerald)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #8b5cf6;"></div>
+                <span>业务运行层 (Violet)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f59e0b;"></div>
+                <span>数据管理层 (Amber)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f43f5e;"></div>
+                <span>基础底座层 (Rose)</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>HiveCloud-MS | 轻量微服务脚手架 | 去中心化 · 自愈自治 · 灵活扩展</p>
+            <p>架构版本: v1.0.0 | 技术栈: SpringBoot 3.x + SpringCloud Alibaba 精简版</p>
+        </div>
+    </div>
+</body>
+</html>
