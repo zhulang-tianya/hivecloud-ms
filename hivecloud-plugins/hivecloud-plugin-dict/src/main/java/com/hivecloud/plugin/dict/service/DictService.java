@@ -11,16 +11,48 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * 字典服务类
+ * 提供字典数据查询和缓存功能
+ * 使用二级缓存提升查询性能
+ *
+ * @author HiveCloud Team
+ * @date 2026-04-25
+ * @see SysDictMapper
+ * @see CacheService
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class DictService {
 
+    /**
+     * 字典缓存 Key 前缀
+     */
     private static final String DICT_CACHE_PREFIX = "hivecloud:dict:";
+
+    /**
+     * 缓存过期时间（分钟）
+     */
     private static final long CACHE_TTL_MINUTES = 30;
 
+    /**
+     * 字典 Mapper 接口
+     */
     private final SysDictMapper dictMapper;
+
+    /**
+     * 缓存服务接口
+     */
     private final CacheService cacheService;
 
+    /**
+     * 获取字典标签
+     * 先查缓存，未命中则查数据库并回写缓存
+     *
+     * @param dictCode 字典编码
+     * @param dictValue 字典值
+     * @return 字典标签，不存在时返回 null
+     */
     public String getDictLabel(String dictCode, String dictValue) {
         String cacheKey = DICT_CACHE_PREFIX + dictCode + ":" + dictValue;
         Object cached = cacheService.get(cacheKey);
