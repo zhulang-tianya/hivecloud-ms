@@ -18,7 +18,6 @@
         <module>hivecloud-framework</module>
         <module>hivecloud-gateway</module>
         <module>hivecloud-modules</module>
-        <module>hivecloud-services</module>
         <module>hivecloud-plugins</module>
     </modules>
 
