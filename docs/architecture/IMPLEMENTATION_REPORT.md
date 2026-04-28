@@ -151,7 +151,7 @@ HiveCloud 是一款基于 Java 生态开发的下一代轻量微服务脚手架�
 
 | 模块名称 | 标识 | 部署方式 | 功能说明 | 依赖关系 |
 |---------|------|---------|---------|---------|
-| 系统管理模块 | hivecloud-module-system | 模块化单体 | 用户、角色、权限、菜单、字典、配置管理 | 无 |
+| 系统管理模块 | hivecloud-module-system | 模块化单体/可独立部署 | 用户、角色、权限、菜单、字典、配置管理 | 无 |
 | 统一业务网关 | hivecloud-gateway | 独立部署 | 鉴权、限流、路由转发、风控、跨域处理 | 依赖 system |
 | 轻量元数据注册 | hivecloud-service-registry | 嵌入服务节点 | Redis Hash 存储元数据，元数据TTL=30s | 依赖 Redis |
 | 分布式心跳探测 | hivecloud-heartbeat | 嵌入服务节点 | 1s心跳间隔，3s不健康，4s剔除 | 依赖 Redis |
@@ -177,10 +177,10 @@ HiveCloud 是一款基于 Java 生态开发的下一代轻量微服务脚手架�
 
 | 模块名称 | 标识 | 部署方式 | 功能说明 | 依赖关系 |
 |---------|------|---------|---------|---------|
-| 支付服务 | hivecloud-service-pay | 独立微服务 | 订单支付、退款、对账、支付渠道对接 | 无 |
-| 理赔服务 | hivecloud-service-claim | 独立微服务 | 理赔申请、审核、赔付 | 无 |
-| 活动服务 | hivecloud-service-activity | 独立微服务 | 活动创建、参与、奖励发放 | 无 |
-| 通知服务 | hivecloud-service-notice | 独立微服务 | 短信、邮件、站内信 | 无 |
+| 支付服务 | hivecloud-module-payment | 模块化单体/可独立部署 | 订单支付、退款、对账、支付渠道对接 | 无 |
+| 理赔服务 | hivecloud-module-claim | 模块化单体/可独立部署 | 理赔申请、审核、赔付 | 无 |
+| 活动服务 | hivecloud-module-activity | 模块化单体/可独立部署 | 活动创建、参与、奖励发放 | 无 |
+| 通知服务 | hivecloud-module-notify | 模块化单体/可独立部署 | 短信、邮件、站内信 | 无 |
 | AI插件 | hivecloud-plugin-ai | 插件 | AI能力集成 | 无 |
 | 加密插件 | hivecloud-plugin-encrypt | 插件 | 数据加密/解密 | 无 |
 | 消息插件 | hivecloud-plugin-message | 插件 | RocketMQ/RabbitMQ 集成 | 无 |
@@ -755,63 +755,79 @@ hivecloud-ms/                                          # 根项目（父POM）
 │               │   └── charts.js
 │               └── assets/
 │
-├── hivecloud-services/                                # 独立微服务
+├── hivecloud-modules/                                 # 业务模块（统一目录，支持单体/微服务部署）
 │   ├── pom.xml
 │   │
-│   ├── hivecloud-service-pay/                         # 支付服务
+│   ├── hivecloud-module-system/                       # 系统管理模块（核心单体）
 │   │   ├── pom.xml
-│   │   ├── src/main/java/com/hivecloud/service/pay/
-│   │   │   ├── PayApplication.java
+│   │   ├── src/main/java/com/hivecloud/system/
+│   │   │   ├── SystemApplication.java
 │   │   │   ├── controller/
-│   │   │   │   ├── OrderController.java
-│   │   │   │   ├── PayController.java
-│   │   │   │   └── RefundController.java
+│   │   │   │   ├── SysUserController.java
+│   │   │   │   ├── SysRoleController.java
+│   │   │   │   └── SysMenuController.java
 │   │   │   ├── service/
-│   │   │   │   ├── OrderService.java
-│   │   │   │   ├── OrderServiceImpl.java
-│   │   │   │   ├── PayService.java
-│   │   │   │   ├── PayServiceImpl.java
-│   │   │   │   ├── RefundService.java
-│   │   │   │   └── RefundServiceImpl.java
-│   │   │   ├── mapper/
-│   │   │   │   ├── OrderMapper.java
-│   │   │   │   └── PayRecordMapper.java
+│   │   │   │   ├── SysUserService.java
+│   │   │   │   └── SysUserServiceImpl.java
 │   │   │   ├── entity/
-│   │   │   │   ├── OrderEntity.java
-│   │   │   │   └── PayRecordEntity.java
-│   │   │   ├── dto/
-│   │   │   │   ├── CreateOrderDTO.java
-│   │   │   │   └── PayDTO.java
-│   │   │   └── vo/
-│   │   │       ├── OrderVO.java
-│   │   │       └── PayResultVO.java
+│   │   │   │   ├── SysUser.java
+│   │   │   │   ├── SysRole.java
+│   │   │   │   └── SysMenu.java
+│   │   │   ├── mapper/
+│   │   │   │   ├── SysUserMapper.java
+│   │   │   │   └── SysRoleMapper.java
+│   │   │   ├── vo/
+│   │   │   │   ├── UserVO.java
+│   │   │   │   └── LoginVO.java
+│   │   │   └── dto/
+│   │   │       ├── UserDTO.java
+│   │   │       └── LoginDTO.java
 │   │   └── src/main/resources/
 │   │       ├── application.yml
-│   │       ├── application-dev.yml
-│   │       ├── application-test.yml
-│   │       └── application-prod.yml
+│   │       └── db/schema.sql
 │   │
-│   ├── hivecloud-service-claim/                       # 理赔服务
+│   ├── hivecloud-module-payment/                      # 支付模块（可独立部署）
 │   │   ├── pom.xml
-│   │   ├── src/main/java/com/hivecloud/service/claim/
+│   │   ├── src/main/java/com/hivecloud/module/payment/
+│   │   │   ├── PaymentApplication.java
+│   │   │   ├── controller/
+│   │   │   │   ├── PaymentController.java
+│   │   │   │   └── OrderController.java
+│   │   │   ├── service/
+│   │   │   │   ├── PaymentService.java
+│   │   │   │   └── PaymentServiceImpl.java
+│   │   │   ├── entity/
+│   │   │   │   ├── PaymentOrderEntity.java
+│   │   │   │   └── OrderEntity.java
+│   │   │   ├── mapper/
+│   │   │   │   ├── PaymentMapper.java
+│   │   │   │   └── OrderMapper.java
+│   │   │   ├── dto/
+│   │   │   │   ├── PaymentRequest.java
+│   │   │   │   └── CreateOrderDTO.java
+│   │   │   └── vo/
+│   │   │       ├── PaymentResponse.java
+│   │   │       └── OrderVO.java
+│   │   └── src/main/resources/
+│   │       ├── application.yml
+│   │       └── db/schema.sql
+│   │
+│   ├── hivecloud-module-claim/                        # 理赔模块（可独立部署）
+│   │   ├── pom.xml
+│   │   ├── src/main/java/com/hivecloud/module/claim/
 │   │   │   ├── ClaimApplication.java
 │   │   │   ├── controller/
 │   │   │   │   ├── ClaimController.java
-│   │   │   │   ├── AuditController.java
-│   │   │   │   └── SettlementController.java
+│   │   │   │   └── AuditController.java
 │   │   │   ├── service/
 │   │   │   │   ├── ClaimService.java
-│   │   │   │   ├── ClaimServiceImpl.java
-│   │   │   │   ├── AuditService.java
-│   │   │   │   ├── AuditServiceImpl.java
-│   │   │   │   ├── SettlementService.java
-│   │   │   │   └── SettlementServiceImpl.java
-│   │   │   ├── mapper/
-│   │   │   │   ├── ClaimMapper.java
-│   │   │   │   └── AuditRecordMapper.java
+│   │   │   │   └── ClaimServiceImpl.java
 │   │   │   ├── entity/
 │   │   │   │   ├── ClaimEntity.java
 │   │   │   │   └── AuditRecordEntity.java
+│   │   │   ├── mapper/
+│   │   │   │   ├── ClaimMapper.java
+│   │   │   │   └── AuditRecordMapper.java
 │   │   │   ├── dto/
 │   │   │   │   ├── CreateClaimDTO.java
 │   │   │   │   └── AuditDTO.java
@@ -820,73 +836,17 @@ hivecloud-ms/                                          # 根项目（父POM）
 │   │   │       └── AuditResultVO.java
 │   │   └── src/main/resources/
 │   │       ├── application.yml
-│   │       ├── application-dev.yml
-│   │       ├── application-test.yml
-│   │       └── application-prod.yml
+│   │       └── db/schema.sql
 │   │
-│   ├── hivecloud-service-activity/                    # 活动服务
+│   ├── hivecloud-module-activity/                     # 活动模块（可独立部署）
 │   │   ├── pom.xml
-│   │   ├── src/main/java/com/hivecloud/service/activity/
-│   │   │   ├── ActivityApplication.java
-│   │   │   ├── controller/
-│   │   │   │   ├── ActivityController.java
-│   │   │   │   ├── ParticipateController.java
-│   │   │   │   └── RewardController.java
-│   │   │   ├── service/
-│   │   │   │   ├── ActivityService.java
-│   │   │   │   ├── ActivityServiceImpl.java
-│   │   │   │   ├── ParticipateService.java
-│   │   │   │   ├── ParticipateServiceImpl.java
-│   │   │   │   ├── RewardService.java
-│   │   │   │   └── RewardServiceImpl.java
-│   │   │   ├── mapper/
-│   │   │   │   ├── ActivityMapper.java
-│   │   │   │   └── ParticipateRecordMapper.java
-│   │   │   ├── entity/
-│   │   │   │   ├── ActivityEntity.java
-│   │   │   │   └── ParticipateRecordEntity.java
-│   │   │   ├── dto/
-│   │   │   │   ├── CreateActivityDTO.java
-│   │   │   │   └── ParticipateDTO.java
-│   │   │   └── vo/
-│   │   │       ├── ActivityVO.java
-│   │   │       └── RewardVO.java
-│   │   └── src/main/resources/
-│   │       ├── application.yml
-│   │       ├── application-dev.yml
-│   │       ├── application-test.yml
-│   │       └── application-prod.yml
+│   │   └── src/main/java/com/hivecloud/module/activity/
+│   │       └── ...
 │   │
-│   └── hivecloud-service-notice/                      # 通知服务
+│   └── hivecloud-module-notify/                       # 通知模块（可独立部署）
 │       ├── pom.xml
-│       ├── src/main/java/com/hivecloud/service/notice/
-│       │   ├── NoticeApplication.java
-│       │   ├── controller/
-│       │   │   ├── SmsController.java
-│       │   │   ├── EmailController.java
-│       │   │   └── StationLetterController.java
-│       │   ├── service/
-│       │   │   ├── SmsService.java
-│       │   │   ├── SmsServiceImpl.java
-│       │   │   ├── EmailService.java
-│       │   │   ├── EmailServiceImpl.java
-│       │   │   ├── StationLetterService.java
-│       │   │   └── StationLetterServiceImpl.java
-│       │   ├── mapper/
-│       │   │   ├── SmsRecordMapper.java
-│       │   │   └── EmailRecordMapper.java
-│       │   ├── entity/
-│       │   │   ├── SmsRecordEntity.java
-│       │   │   └── EmailRecordEntity.java
-│       │   ├── dto/
-│       │   │   ├── SendSmsDTO.java
-│       │   │   └── SendEmailDTO.java
-│       │   └── vo/
-│       │       ├── SmsResultVO.java
-│       │       └── EmailResultVO.java
-│       └── src/main/resources/
-│           ├── application.yml
-│           ├── application-dev.yml
+│       └── src/main/java/com/hivecloud/module/notify/
+│           └── ...
 │           ├── application-test.yml
 │           └── application-prod.yml
 │
