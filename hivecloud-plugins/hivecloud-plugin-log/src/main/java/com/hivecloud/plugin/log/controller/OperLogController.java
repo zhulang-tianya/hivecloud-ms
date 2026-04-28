@@ -5,6 +5,9 @@ import com.hivecloud.common.core.result.PageResult;
 import com.hivecloud.common.core.result.Result;
 import com.hivecloud.plugin.log.entity.SysOperLog;
 import com.hivecloud.plugin.log.service.OperLogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +18,9 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * 操作日志控制器
+ * <p>
  * 提供操作日志的查询、删除等接口
+ * </p>
  *
  * @author HiveCloud Team
  * @date 2026-04-25
@@ -26,6 +31,7 @@ import jakarta.validation.constraints.NotBlank;
 @RequestMapping("/system/v1/oper-log")
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "操作日志", description = "操作日志的查询、删除等接口")
 public class OperLogController {
 
     /**
@@ -43,6 +49,11 @@ public class OperLogController {
      * @return 分页结果
      */
     @GetMapping("/page")
+    @Operation(summary = "分页查询操作日志", description = "分页查询操作日志列表")
+    @Parameter(name = "pageNum", description = "页码", required = false, example = "1")
+    @Parameter(name = "pageSize", description = "每页大小", required = false, example = "10")
+    @Parameter(name = "title", description = "操作标题", required = false)
+    @Parameter(name = "operName", description = "操作人员", required = false)
     public Result<PageResult<SysOperLog>> page(
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "页码必须大于 0") int pageNum,
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "每页大小必须大于 0") int pageSize,
@@ -61,6 +72,8 @@ public class OperLogController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "删除操作日志", description = "根据日志 ID 删除操作日志")
+    @Parameter(name = "id", description = "日志 ID", required = true, example = "1")
     public Result<Void> delete(@PathVariable("id") @Min(value = 1, message = "日志 ID 必须大于 0") Long id) {
         log.info("删除操作日志，id:{}", id);
         operLogService.removeById(id);

@@ -125,6 +125,13 @@
                 <version>${knife4j.version}</version>
             </dependency>
 
+            <!-- Swagger Annotations -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>2.2.19</version>
+            </dependency>
+
             <!-- Utils -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
