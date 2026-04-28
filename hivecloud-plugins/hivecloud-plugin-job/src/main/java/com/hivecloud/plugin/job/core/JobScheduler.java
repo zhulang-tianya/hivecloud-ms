@@ -4,9 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -73,9 +74,10 @@ public class JobScheduler {
 
         try {
             ScheduledFuture<?> future = taskScheduler.schedule(task, triggerContext -> {
-                Instant nextTime = triggerContext.lastScheduledExecutionTime()
-                        .map(time -> time.plusMillis(1000))
-                        .orElse(Instant.now());
+                Date lastTime = triggerContext.lastScheduledExecutionTime();
+                Instant nextTime = (lastTime != null) 
+                    ? lastTime.toInstant().plusMillis(1000)
+                    : Instant.now();
                 return nextTime;
             });
 

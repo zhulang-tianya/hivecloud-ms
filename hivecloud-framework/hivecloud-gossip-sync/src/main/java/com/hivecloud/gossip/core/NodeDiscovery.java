@@ -10,6 +10,8 @@ public interface NodeDiscovery {
 
     void removeNode(String nodeId);
 
+    GossipNode getNode(String nodeId);
+
     List<GossipNode> getActiveNodes();
 
     List<GossipNode> selectRandomPeers(int count);

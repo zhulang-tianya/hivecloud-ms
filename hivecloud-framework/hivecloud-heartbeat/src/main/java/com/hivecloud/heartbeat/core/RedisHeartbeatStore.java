@@ -33,6 +33,12 @@ public class RedisHeartbeatStore implements HeartbeatStore {
      * 格式：hivecloud:heartbeat:{instanceId}
      */
     private static final String HEARTBEAT_KEY_TEMPLATE = HEARTBEAT_PREFIX + "{instanceId}";
+    
+    /**
+     * 心跳 Key 前缀（用于 exists 方法）
+     * 格式：hivecloud:heartbeat:
+     */
+    private static final String HEARTBEAT_KEY_PREFIX = HEARTBEAT_PREFIX;
 
     /**
      * 心跳过期时间（秒），默认 30 秒

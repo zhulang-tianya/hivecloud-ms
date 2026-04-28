@@ -27,5 +27,6 @@
         <module>hivecloud-plugin-ai</module>
         <module>hivecloud-plugin-encrypt</module>
         <module>hivecloud-plugin-message</module>
+        <module>hivecloud-plugin-crypto</module>
     </modules>
 </project>

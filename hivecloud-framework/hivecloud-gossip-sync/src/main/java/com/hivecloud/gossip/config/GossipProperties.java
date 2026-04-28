@@ -7,6 +7,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "hivecloud.gossip")
 public class GossipProperties {
 
+    private String ip;
+
+    private Integer port;
+
     private int fanout = 3;
 
     private long syncIntervalMillis = 5000;

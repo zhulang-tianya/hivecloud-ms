@@ -47,10 +47,15 @@ public class RedisNodeDiscovery implements NodeDiscovery {
     private static final String GOSSIP_PREFIX = "hivecloud:gossip:";
     
     /**
+     * 节点 Key 前缀
+     */
+    private static final String NODE_KEY_PREFIX = GOSSIP_PREFIX + "nodes:";
+    
+    /**
      * 节点 Key 模板
      * 格式：hivecloud:gossip:nodes:{nodeId}
      */
-    private static final String NODE_KEY_TEMPLATE = GOSSIP_PREFIX + "nodes:{nodeId}";
+    private static final String NODE_KEY_TEMPLATE = NODE_KEY_PREFIX + "{nodeId}";
 
     /**
      * 构建节点 Key

@@ -4,15 +4,13 @@ import com.hivecloud.common.core.result.Result;
 import com.hivecloud.module.payment.dto.PaymentRequest;
 import com.hivecloud.module.payment.service.PaymentService;
 import com.hivecloud.module.payment.vo.PaymentResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -29,10 +27,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/payment")
 @Validated
-@Tag(name = "支付管理", description = "支付订单管理接口")
 public class PaymentController {
 
-    @Resource
+    @Autowired
     private PaymentService paymentService;
 
     /**
@@ -42,7 +39,6 @@ public class PaymentController {
      * @return 支付响应
      */
     @PostMapping("/create")
-    @Operation(summary = "创建支付订单")
     public Result<PaymentResponse> createOrder(@Validated @RequestBody PaymentRequest request) {
         log.info("创建支付订单接口开始执行，请求参数：{}", request);
         PaymentResponse response = paymentService.createOrder(request);
@@ -57,7 +53,6 @@ public class PaymentController {
      * @return 支付响应
      */
     @GetMapping("/query/{orderNo}")
-    @Operation(summary = "查询支付订单")
     public Result<PaymentResponse> queryOrder(@PathVariable String orderNo) {
         log.info("查询支付订单接口开始执行，orderNo:{}", orderNo);
         PaymentResponse response = paymentService.queryOrder(orderNo);
@@ -74,7 +69,6 @@ public class PaymentController {
      * @return 支付响应
      */
     @PostMapping("/refund/{orderNo}")
-    @Operation(summary = "退款")
     public Result<PaymentResponse> refund(
             @PathVariable String orderNo,
             @RequestParam BigDecimal amount,
@@ -92,7 +86,6 @@ public class PaymentController {
      * @return 支付响应
      */
     @PostMapping("/close/{orderNo}")
-    @Operation(summary = "关闭订单")
     public Result<PaymentResponse> closeOrder(@PathVariable String orderNo) {
         log.info("关闭订单接口开始执行，orderNo:{}", orderNo);
         PaymentResponse response = paymentService.closeOrder(orderNo);
@@ -108,7 +101,6 @@ public class PaymentController {
      * @throws IOException IO 异常
      */
     @PostMapping("/notify/alipay")
-    @Operation(summary = "支付宝异步通知")
     public void alipayNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("收到支付宝异步通知");
 
@@ -130,7 +122,6 @@ public class PaymentController {
      * @throws IOException IO 异常
      */
     @PostMapping("/notify/wechat")
-    @Operation(summary = "微信异步通知")
     public void wechatNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("收到微信异步通知");
 

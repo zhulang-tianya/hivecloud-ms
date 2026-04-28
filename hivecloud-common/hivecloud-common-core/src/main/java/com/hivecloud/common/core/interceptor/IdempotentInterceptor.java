@@ -2,13 +2,13 @@ package com.hivecloud.common.core.interceptor;
 
 import com.hivecloud.common.core.annotation.Idempotent;
 import com.hivecloud.common.core.exception.IdempotentException;
-import com.hivecloud.common.redis.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -18,10 +18,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 幂等性拦截器
@@ -39,7 +40,7 @@ import java.util.UUID;
  * @author HiveCloud Team
  * @date 2026-04-27
  * @see Idempotent
- * @see RedisUtil
+ * @see RedisTemplate
  */
 @Slf4j
 @Aspect
@@ -48,10 +49,10 @@ import java.util.UUID;
 public class IdempotentInterceptor {
 
     /**
-     * Redis 工具类
+     * Redis 模板
      */
     @Resource
-    private RedisUtil redisUtil;
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * SpEL 表达式解析器
@@ -90,7 +91,7 @@ public class IdempotentInterceptor {
         long expire = idempotent.expire();
 
         // 尝试获取分布式锁
-        Boolean success = redisUtil.setIfAbsent(key, UUID.randomUUID().toString(), expire);
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(key, UUID.randomUUID().toString(), expire, TimeUnit.SECONDS);
         if (Boolean.FALSE.equals(success)) {
             String message = idempotent.message();
             log.warn("幂等性检查失败，重复请求，key:{}, message:{}", key, message);
@@ -104,7 +105,7 @@ public class IdempotentInterceptor {
 
             // 如果不允许重试，立即删除幂等键
             if (!allowRetry) {
-                redisUtil.delete(key);
+                redisTemplate.delete(key);
                 log.debug("幂等键已删除，key:{}", key);
             }
             // 如果允许重试，保留幂等键直到过期
@@ -112,7 +113,7 @@ public class IdempotentInterceptor {
             return result;
         } catch (Throwable e) {
             // 业务执行失败，删除幂等键，允许重试
-            redisUtil.delete(key);
+            redisTemplate.delete(key);
             log.warn("幂等性方法执行失败，已删除幂等键，key:{}", key, e);
             throw e;
         }

@@ -8,6 +8,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.time.Duration;
@@ -73,6 +74,18 @@ public class GossipSyncEngine implements GossipProtocol {
         this.nodeDiscovery = nodeDiscovery;
         this.properties = properties;
         this.restTemplate = restTemplate;
+    }
+
+    /**
+     * 初始化本地节点信息
+     * 在 Spring 容器启动后自动执行
+     */
+    @PostConstruct
+    public void init() {
+        String ip = properties.getIp() != null ? properties.getIp() : "127.0.0.1";
+        Integer port = properties.getPort() != null ? properties.getPort() : 8080;
+        initLocalNode(ip, port);
+        log.info("Local node initialized: {}", localNode.getNodeId());
     }
 
     /**

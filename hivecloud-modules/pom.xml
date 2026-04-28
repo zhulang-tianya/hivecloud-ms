@@ -18,5 +18,9 @@
 
     <modules>
         <module>hivecloud-module-system</module>
+        <module>hivecloud-module-payment</module>
+        <module>hivecloud-module-claim</module>
+        <module>hivecloud-module-activity</module>
+        <module>hivecloud-module-notify</module>
     </modules>
 </project>

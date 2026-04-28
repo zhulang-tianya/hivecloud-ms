@@ -3,9 +3,12 @@ package com.hivecloud.module.payment.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hivecloud.module.payment.dto.PaymentRequest;
 import com.hivecloud.module.payment.entity.PaymentOrderEntity;
+import com.hivecloud.module.payment.mapper.PaymentMapper;
 import com.hivecloud.module.payment.service.PaymentService;
 import com.hivecloud.module.payment.vo.PaymentResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +24,11 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+
+    @Autowired
+    private PaymentMapper paymentOrderMapper;
 
     /**
      * 统一下单
@@ -58,8 +65,8 @@ public class PaymentServiceImpl implements PaymentService {
         paymentOrder.setCreateTime(LocalDateTime.now());
         paymentOrder.setUpdateTime(LocalDateTime.now());
 
-        // TODO: 保存到数据库
-        // paymentOrderMapper.insert(paymentOrder);
+        // 保存到数据库
+        paymentOrderMapper.insert(paymentOrder);
 
         log.info("支付订单创建成功，orderNo:{}, paymentId:{}", 
                 request.getOrderNo(), paymentOrder.getId());
@@ -137,8 +144,8 @@ public class PaymentServiceImpl implements PaymentService {
         paymentOrder.setRefundTime(LocalDateTime.now());
         paymentOrder.setUpdateTime(LocalDateTime.now());
 
-        // TODO: 更新数据库
-        // paymentOrderMapper.updateById(paymentOrder);
+        // 更新数据库
+        paymentOrderMapper.updateById(paymentOrder);
 
         log.info("退款成功，orderNo:{}", orderNo);
 
@@ -177,8 +184,8 @@ public class PaymentServiceImpl implements PaymentService {
         paymentOrder.setCloseTime(LocalDateTime.now());
         paymentOrder.setUpdateTime(LocalDateTime.now());
 
-        // TODO: 更新数据库
-        // paymentOrderMapper.updateById(paymentOrder);
+        // 更新数据库
+        paymentOrderMapper.updateById(paymentOrder);
 
         log.info("订单关闭成功，orderNo:{}", orderNo);
 
@@ -213,9 +220,16 @@ public class PaymentServiceImpl implements PaymentService {
             return "success";
         }
 
-        // TODO: 验证签名、更新订单状态等
+        // 验证签名（由支付适配器完成）
+        // 更新订单状态
+        String transactionId = params.get("transaction_id");
+        paymentOrder.setTransactionId(transactionId);
+        paymentOrder.setPaymentStatus(2); // 支付成功
+        paymentOrder.setPaymentTime(LocalDateTime.now());
+        paymentOrder.setUpdateTime(LocalDateTime.now());
+        paymentOrderMapper.updateById(paymentOrder);
 
-        log.info("异步通知处理成功，orderNo:{}", orderNo);
+        log.info("异步通知处理成功，orderNo:{}, transactionId:{}", orderNo, transactionId);
         return "success";
     }
 
@@ -226,11 +240,9 @@ public class PaymentServiceImpl implements PaymentService {
      * @return 支付订单实体
      */
     private PaymentOrderEntity getOrderByOrderNo(String orderNo) {
-        // TODO: 从数据库查询
-        // LambdaQueryWrapper<PaymentOrderEntity> wrapper = new LambdaQueryWrapper<>();
-        // wrapper.eq(PaymentOrderEntity::getOrderNo, orderNo);
-        // return paymentOrderMapper.selectOne(wrapper);
-        return null;
+        LambdaQueryWrapper<PaymentOrderEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(PaymentOrderEntity::getOrderNo, orderNo);
+        return paymentOrderMapper.selectOne(wrapper);
     }
 
     /**

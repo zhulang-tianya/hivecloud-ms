@@ -1,0 +1,22 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: hivecloud-notify
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        enabled: false
+
+hivecloud:
+  notify:
+    enabled: true
+    sms:
+      provider: ali
+      ali:
+        access-key: ${SMS_ALI_ACCESS_KEY:}
+        secret-key: ${SMS_ALI_SECRET_KEY:}
+        sign-name: ${SMS_ALI_SIGN_NAME:HiveCloud}
+        template-code: ${SMS_ALI_TEMPLATE_CODE:SMS_123456}

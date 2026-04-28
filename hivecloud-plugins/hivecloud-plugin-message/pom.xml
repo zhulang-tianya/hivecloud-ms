@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>com.hivecloud</groupId>
+            <artifactId>hivecloud-common-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hivecloud</groupId>
             <artifactId>hivecloud-plugin-engine</artifactId>
         </dependency>
         <dependency>
