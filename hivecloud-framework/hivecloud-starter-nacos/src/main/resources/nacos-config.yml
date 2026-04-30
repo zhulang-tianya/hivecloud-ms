@@ -1,9 +1,10 @@
+# Nacos 配置中心统一配置
+# 通过 Maven 资源过滤自动替换占位符
+
 spring:
-  application:
-    name: hivecloud-system
   cloud:
     nacos:
-      # Nacos 服务注册中心配置
+      # 服务注册中心配置
       discovery:
         server-addr: ${nacos.server-addr}
         username: ${nacos.username}
@@ -13,7 +14,7 @@ spring:
         register-enabled: true
         watch-enabled: true
       
-      # Nacos 配置中心配置
+      # 配置中心配置
       config:
         server-addr: ${nacos.server-addr}
         username: ${nacos.username}
@@ -25,9 +26,5 @@ spring:
         refresh-enabled: true
         shared-configs:
           - data-id: hivecloud-common.yaml
-            group: ${nacos.group}
-            refresh: true
-        extension-configs:
-          - data-id: hivecloud-system.yaml
             group: ${nacos.group}
             refresh: true

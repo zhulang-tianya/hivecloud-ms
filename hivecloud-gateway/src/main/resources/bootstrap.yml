@@ -5,29 +5,29 @@ spring:
     nacos:
       # Nacos 服务注册中心配置
       discovery:
-        server-addr: 172.10.6.194:8848
-        username: nacos
-        password: nacos
-        namespace: public
-        group: DEFAULT_GROUP
+        server-addr: ${nacos.server-addr}
+        username: ${nacos.username}
+        password: ${nacos.password}
+        namespace: ${nacos.namespace}
+        group: ${nacos.group}
         register-enabled: true
         watch-enabled: true
       
       # Nacos 配置中心配置
       config:
-        server-addr: 172.10.6.194:8848
-        username: nacos
-        password: nacos
-        namespace: public
-        group: DEFAULT_GROUP
+        server-addr: ${nacos.server-addr}
+        username: ${nacos.username}
+        password: ${nacos.password}
+        namespace: ${nacos.namespace}
+        group: ${nacos.group}
         file-extension: yaml
         enabled: true
         refresh-enabled: true
         shared-configs:
           - data-id: hivecloud-common.yaml
-            group: DEFAULT_GROUP
+            group: ${nacos.group}
             refresh: true
         extension-configs:
           - data-id: hivecloud-gateway.yaml
-            group: DEFAULT_GROUP
+            group: ${nacos.group}
             refresh: true

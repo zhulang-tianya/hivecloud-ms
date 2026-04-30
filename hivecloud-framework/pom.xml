@@ -25,5 +25,6 @@
         <module>hivecloud-direct-connector</module>
         <module>hivecloud-business-link</module>
         <module>hivecloud-event-bus</module>
+        <module>hivecloud-starter-nacos</module>
     </modules>
 </project>
