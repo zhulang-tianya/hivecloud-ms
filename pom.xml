@@ -53,7 +53,7 @@
         <sonar-plugin.version>3.10.0.2594</sonar-plugin.version>
 
         <!-- Nacos 配置中心统一管理 -->
-        <nacos.server-addr>172.10.6.194:8848</nacos.server-addr>
+        <nacos.server-addr>172.40.2.65:8848</nacos.server-addr>
         <nacos.username>nacos</nacos.username>
         <nacos.password>nacos</nacos.password>
         <nacos.namespace>public</nacos.namespace>
@@ -134,7 +134,7 @@
         <profile>
             <id>dev</id>
             <properties>
-                <nacos.namespace>dev</nacos.namespace>
+                <nacos.namespace>cafc6120-cc05-485f-933b-cd9ba227014d</nacos.namespace>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -145,7 +145,7 @@
         <profile>
             <id>test</id>
             <properties>
-                <nacos.namespace>test</nacos.namespace>
+                <nacos.namespace>cafc6120-cc05-485f-933b-cd9ba227014d</nacos.namespace>
             </properties>
         </profile>
         
@@ -153,7 +153,7 @@
         <profile>
             <id>prod</id>
             <properties>
-                <nacos.namespace>prod</nacos.namespace>
+                <nacos.namespace>cafc6120-cc05-485f-933b-cd9ba227014d</nacos.namespace>
             </properties>
         </profile>
     </profiles>

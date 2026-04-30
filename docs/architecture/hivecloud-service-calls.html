@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiveCloud 微服务调用关系图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Microsoft YaHei', monospace;
+            background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .diagram-container {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .call-flow-svg {
+            width: 100%;
+            height: auto;
+            min-height: 600px;
+        }
+
+        .service-node {
+            fill: rgba(30, 41, 59, 0.9);
+            stroke-width: 2;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .service-node.gateway { stroke: #f43f5e; }
+        .service-node.system { stroke: #06b6d4; }
+        .service-node.payment { stroke: #10b981; }
+        .service-node.claim { stroke: #8b5cf6; }
+        .service-node.activity { stroke: #f59e0b; }
+        .service-node.notify { stroke: #ec4899; }
+
+        .service-text {
+            fill: #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .call-arrow {
+            stroke: #38bdf8;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#call-arrowhead);
+            stroke-dasharray: 5, 5;
+            animation: dashAnimation 2s linear infinite;
+        }
+
+        @keyframes dashAnimation {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        .call-label {
+            fill: #38bdf8;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .database-node {
+            fill: rgba(139, 92, 246, 0.2);
+            stroke: #8b5cf6;
+            stroke-width: 2;
+        }
+
+        .external-node {
+            fill: rgba(100, 116, 139, 0.2);
+            stroke: #64748b;
+            stroke-width: 2;
+        }
+
+        .info-panel {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .call-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .call-table th {
+            text-align: left;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+
+        .call-table td {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            color: #94a3b8;
+        }
+
+        .call-table tr:hover {
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.gateway { background: #f43f5e; }
+        .legend-dot.system { background: #06b6d4; }
+        .legend-dot.payment { background: #10b981; }
+        .legend-dot.claim { background: #8b5cf6; }
+        .legend-dot.activity { background: #f59e0b; }
+        .legend-dot.notify { background: #ec4899; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 HiveCloud 微服务调用关系图</h1>
+        <p class="subtitle">服务间调用 + 数据流向 + 依赖关系</p>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot gateway"></div>
+                <span>Gateway (网关)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot system"></div>
+                <span>System (系统)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot payment"></div>
+                <span>Payment (支付)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot claim"></div>
+                <span>Claim (理赔)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot activity"></div>
+                <span>Activity (活动)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot notify"></div>
+                <span>Notify (通知)</span>
+            </div>
+        </div>
+
+        <!-- 调用关系图 -->
+        <div class="diagram-container">
+            <svg class="call-flow-svg" viewBox="0 0 1400 700">
+                <!-- 定义箭头 -->
+                <defs>
+                    <marker id="call-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#38bdf8" />
+                    </marker>
+                    <marker id="db-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6" />
+                    </marker>
+                </defs>
+
+                <!-- 用户/客户端 -->
+                <g transform="translate(50, 300)">
+                    <rect x="0" y="0" width="120" height="80" rx="8" class="external-node"/>
+                    <text x="60" y="35" text-anchor="middle" class="service-text" fill="#64748b">👤 用户</text>
+                    <text x="60" y="55" text-anchor="middle" class="service-text" fill="#64748b" style="font-size: 11px;">Web/Mobile</text>
+                </g>
+
+                <!-- Gateway -->
+                <g transform="translate(250, 300)">
+                    <rect x="0" y="0" width="140" height="80" rx="8" class="service-node gateway"/>
+                    <text x="70" y="35" text-anchor="middle" class="service-text">🚪 Gateway</text>
+                    <text x="70" y="55" text-anchor="middle" class="service-text" style="font-size: 11px;">业务网关</text>
+                </g>
+
+                <!-- System -->
+                <g transform="translate(500, 100)">
+                    <rect x="0" y="0" width="140" height="80" rx="8" class="service-node system"/>
+                    <text x="70" y="35" text-anchor="middle" class="service-text">👤 System</text>
+                    <text x="70" y="55" text-anchor="middle" class="service-text" style="font-size: 11px;">系统管理</text>
+                </g>
+
+                <!-- Payment -->
+                <g transform="translate(700, 300)">
+                    <rect x="0" y="0" width="140" height="80" rx="8" class="service-node payment"/>
+                    <text x="70" y="35" text-anchor="middle" class="service-text">💳 Payment</text>
+                    <text x="70" y="55" text-anchor="middle" class="service-text" style="font-size: 11px;">支付服务</text>
+                </g>
+
+                <!-- Claim -->
+                <g transform="translate(900, 100)">
+                    <rect x="0" y="0" width="140" height="80" rx="8" class="service-node claim"/>
+                    <text x="70" y="35" text-anchor="middle" class="service-text">📝 Claim</text>
+                    <text x="70" y="55" text-anchor="middle" class="service-text" style="font-size: 11px;">理赔服务</text>
+                </g>
+
+                <!-- Activity -->
+                <g transform="translate(900, 500)">
+                    <rect x="0" y="0" width="140" height="80" rx="8" class="service-node activity"/>
+                    <text x="70" y="35" text-anchor="middle" class="service-text">🎁 Activity</text>
+                    <text x="70" y="55" text-anchor="middle" class="service-text" style="font-size: 11px;">活动服务</text>
+                </g>
+
+                <!-- Notify -->
+                <g transform="translate(1100, 300)">
+                    <rect x="0" y="0" width="140" height="80" rx="8" class="service-node notify"/>
+                    <text x="70" y="35" text-anchor="middle" class="service-text">📱 Notify</text>
+                    <text x="70" y="55" text-anchor="middle" class="service-text" style="font-size: 11px;">通知服务</text>
+                </g>
+
+                <!-- 数据库 -->
+                <g transform="translate(500, 550)">
+                    <ellipse cx="70" cy="40" rx="60" ry="30" class="database-node"/>
+                    <text x="70" y="45" text-anchor="middle" class="service-text" fill="#8b5cf6">💾 MySQL</text>
+                </g>
+
+                <!-- Redis -->
+                <g transform="translate(700, 550)">
+                    <ellipse cx="70" cy="40" rx="60" ry="30" class="database-node"/>
+                    <text x="70" y="45" text-anchor="middle" class="service-text" fill="#8b5cf6">🔴 Redis</text>
+                </g>
+
+                <!-- 外部系统 -->
+                <g transform="translate(1300, 100)">
+                    <rect x="0" y="0" width="100" height="80" rx="8" class="external-node"/>
+                    <text x="50" y="35" text-anchor="middle" class="service-text" fill="#64748b" style="font-size: 11px;">微信/支付宝</text>
+                    <text x="50" y="55" text-anchor="middle" class="service-text" fill="#64748b" style="font-size: 11px;">短信 API</text>
+                </g>
+
+                <!-- 调用箭头 -->
+                <!-- 用户 -> Gateway -->
+                <path d="M 170 340 L 240 340" class="call-arrow"/>
+                <text x="205" y="330" text-anchor="middle" class="call-label">HTTP</text>
+
+                <!-- Gateway -> System -->
+                <path d="M 350 310 C 400 310, 400 180, 490 180" class="call-arrow"/>
+                <text x="420" y="240" text-anchor="middle" class="call-label">用户认证</text>
+
+                <!-- Gateway -> Payment -->
+                <path d="M 390 340 L 690 340" class="call-arrow"/>
+                <text x="540" y="330" text-anchor="middle" class="call-label">支付请求</text>
+
+                <!-- Gateway -> Claim -->
+                <path d="M 380 320 C 550 320, 550 180, 890 180" class="call-arrow"/>
+                <text x="600" y="240" text-anchor="middle" class="call-label">理赔申请</text>
+
+                <!-- Gateway -> Activity -->
+                <path d="M 380 360 C 550 360, 550 500, 890 500" class="call-arrow"/>
+                <text x="600" y="450" text-anchor="middle" class="call-label">活动参与</text>
+
+                <!-- Gateway -> Notify -->
+                <path d="M 390 350 C 650 350, 650 340, 1090 340" class="call-arrow"/>
+                <text x="700" y="360" text-anchor="middle" class="call-label">发送通知</text>
+
+                <!-- Payment -> Notify -->
+                <path d="M 840 320 C 900 320, 900 320, 1090 320" class="call-arrow"/>
+                <text x="950" y="310" text-anchor="middle" class="call-label">支付成功通知</text>
+
+                <!-- Claim -> Notify -->
+                <path d="M 1040 140 C 1070 140, 1070 300, 1090 310" class="call-arrow"/>
+                <text x="1080" y="230" text-anchor="middle" class="call-label">理赔通知</text>
+
+                <!-- Activity -> Notify -->
+                <path d="M 1040 520 C 1070 520, 1070 380, 1090 370" class="call-arrow"/>
+                <text x="1080" y="450" text-anchor="middle" class="call-label">活动通知</text>
+
+                <!-- Payment -> 外部系统 -->
+                <path d="M 840 310 C 1000 310, 1000 180, 1290 180" class="call-arrow"/>
+                <text x="1050" y="240" text-anchor="middle" class="call-label">支付 API</text>
+
+                <!-- Notify -> 外部系统 -->
+                <path d="M 1240 310 C 1270 310, 1270 180, 1290 180" class="call-arrow"/>
+                <text x="1280" y="250" text-anchor="middle" class="call-label">短信 API</text>
+
+                <!-- 服务 -> 数据库 -->
+                <path d="M 570 180 L 570 510" class="call-arrow" style="stroke: #8b5cf6;"/>
+                <text x="585" y="350" text-anchor="middle" class="call-label" fill="#8b5cf6">CRUD</text>
+
+                <path d="M 770 380 L 770 510" class="call-arrow" style="stroke: #8b5cf6;"/>
+                <text x="785" y="450" text-anchor="middle" class="call-label" fill="#8b5cf6">CRUD</text>
+
+                <path d="M 970 180 L 750 520" class="call-arrow" style="stroke: #8b5cf6;"/>
+                <text x="870" y="350" text-anchor="middle" class="call-label" fill="#8b5cf6">CRUD</text>
+
+                <path d="M 970 540 L 780 560" class="call-arrow" style="stroke: #8b5cf6;"/>
+                <text x="880" y="560" text-anchor="middle" class="call-label" fill="#8b5cf6">CRUD</text>
+
+                <path d="M 1170 340 L 1170 520 L 780 560" class="call-arrow" style="stroke: #8b5cf6;"/>
+                <text x="1050" y="450" text-anchor="middle" class="call-label" fill="#8b5cf6">CRUD</text>
+
+                <!-- 服务 -> Redis -->
+                <path d="M 630 180 L 730 520" class="call-arrow" style="stroke: #f59e0b;"/>
+                <text x="700" y="350" text-anchor="middle" class="call-label" fill="#f59e0b">缓存</text>
+
+                <path d="M 390 370 C 550 370, 550 530, 730 530" class="call-arrow" style="stroke: #f59e0b;"/>
+                <text x="550" y="420" text-anchor="middle" class="call-label" fill="#f59e0b">限流/Session</text>
+
+                <!-- Nacos -->
+                <g transform="translate(1250, 550)">
+                    <rect x="0" y="0" width="120" height="80" rx="8" style="fill: rgba(56, 189, 248, 0.1); stroke: #38bdf8; stroke-width: 2;"/>
+                    <text x="60" y="35" text-anchor="middle" class="service-text" fill="#38bdf8">☁️ Nacos</text>
+                    <text x="60" y="55" text-anchor="middle" class="service-text" fill="#38bdf8" style="font-size: 11px;">配置中心</text>
+                </g>
+
+                <!-- Nacos -> 所有服务 -->
+                <path d="M 1250 590 C 1200 590, 1200 340, 1240 340" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <path d="M 1250 590 C 1200 590, 1200 540, 1170 540" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <path d="M 1250 590 C 1200 590, 1200 180, 1040 180" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <path d="M 1250 590 C 1200 590, 1200 380, 1040 380" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <path d="M 1250 590 C 1200 590, 1200 560, 970 560" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <path d="M 1250 590 C 1200 590, 1200 540, 840 380" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <path d="M 1250 590 C 1200 590, 1200 200, 640 180" class="call-arrow" style="stroke: #38bdf8; stroke-dasharray: 3,3;"/>
+                <text x="1150" y="450" text-anchor="middle" class="call-label" fill="#38bdf8">配置下发</text>
+            </svg>
+        </div>
+
+        <!-- 调用关系表 -->
+        <div class="info-panel">
+            <h2 style="color: #38bdf8; margin-bottom: 20px;">📊 服务调用关系详情</h2>
+            
+            <table class="call-table">
+                <thead>
+                    <tr>
+                        <th>调用方</th>
+                        <th>被调用方</th>
+                        <th>调用方式</th>
+                        <th>业务场景</th>
+                        <th>频率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>👤 用户</td>
+                        <td>🚪 Gateway</td>
+                        <td>HTTP/HTTPS</td>
+                        <td>所有业务请求入口</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>🚪 Gateway</td>
+                        <td>👤 System</td>
+                        <td>HTTP (Feign)</td>
+                        <td>用户认证、权限校验</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>🚪 Gateway</td>
+                        <td>💳 Payment</td>
+                        <td>HTTP (Feign)</td>
+                        <td>支付请求转发</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>🚪 Gateway</td>
+                        <td>📝 Claim</td>
+                        <td>HTTP (Feign)</td>
+                        <td>理赔申请查询</td>
+                        <td>低</td>
+                    </tr>
+                    <tr>
+                        <td>🚪 Gateway</td>
+                        <td>🎁 Activity</td>
+                        <td>HTTP (Feign)</td>
+                        <td>活动参与、优惠券</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>🚪 Gateway</td>
+                        <td>📱 Notify</td>
+                        <td>HTTP (Feign)</td>
+                        <td>验证码发送</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>💳 Payment</td>
+                        <td>📱 Notify</td>
+                        <td>HTTP (Feign)</td>
+                        <td>支付成功通知</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>📝 Claim</td>
+                        <td>📱 Notify</td>
+                        <td>HTTP (Feign)</td>
+                        <td>理赔进度通知</td>
+                        <td>低</td>
+                    </tr>
+                    <tr>
+                        <td>🎁 Activity</td>
+                        <td>📱 Notify</td>
+                        <td>HTTP (Feign)</td>
+                        <td>活动提醒</td>
+                        <td>低</td>
+                    </tr>
+                    <tr>
+                        <td>💳 Payment</td>
+                        <td>🌐 微信/支付宝</td>
+                        <td>HTTP API</td>
+                        <td>支付接口调用</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>📱 Notify</td>
+                        <td>🌐 短信服务商</td>
+                        <td>HTTP API</td>
+                        <td>短信发送</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>所有服务</td>
+                        <td>💾 MySQL</td>
+                        <td>JDBC</td>
+                        <td>数据持久化</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>所有服务</td>
+                        <td>🔴 Redis</td>
+                        <td>Redis Protocol</td>
+                        <td>缓存、限流、Session</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>所有服务</td>
+                        <td>☁️ Nacos</td>
+                        <td>HTTP</td>
+                        <td>配置加载、服务注册</td>
+                        <td>低 (启动时)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 典型业务流程 -->
+        <div class="info-panel" style="margin-top: 40px;">
+            <h2 style="color: #10b981; margin-bottom: 20px;">🔄 典型业务流程</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                <!-- 用户登录流程 -->
+                <div style="background: rgba(6, 182, 212, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #06b6d4;">
+                    <h3 style="color: #06b6d4; margin-bottom: 15px;">🔐 用户登录流程</h3>
+                    <ol style="padding-left: 20px; color: #94a3b8; line-height: 2;">
+                        <li>用户 → Gateway: 提交登录请求</li>
+                        <li>Gateway → System: 转发认证请求</li>
+                        <li>System → MySQL: 查询用户信息</li>
+                        <li>System → Redis: 缓存用户信息</li>
+                        <li>System → Gateway: 返回 JWT Token</li>
+                        <li>Gateway → 用户：返回登录结果</li>
+                    </ol>
+                </div>
+
+                <!-- 支付流程 -->
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <h3 style="color: #10b981; margin-bottom: 15px;">💳 支付流程</h3>
+                    <ol style="padding-left: 20px; color: #94a3b8; line-height: 2;">
+                        <li>用户 → Gateway: 发起支付请求</li>
+                        <li>Gateway → Payment: 转发支付请求</li>
+                        <li>Payment → MySQL: 创建支付订单</li>
+                        <li>Payment → 微信/支付宝：调用支付接口</li>
+                        <li>Payment → Notify: 发送支付成功通知</li>
+                        <li>Notify → 短信 API: 发送短信</li>
+                        <li>Payment → Gateway: 返回支付结果</li>
+                    </ol>
+                </div>
+
+                <!-- 理赔流程 -->
+                <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                    <h3 style="color: #8b5cf6; margin-bottom: 15px;">📝 理赔流程</h3>
+                    <ol style="padding-left: 20px; color: #94a3b8; line-height: 2;">
+                        <li>用户 → Gateway: 提交理赔申请</li>
+                        <li>Gateway → Claim: 转发理赔申请</li>
+                        <li>Claim → MySQL: 保存理赔记录</li>
+                        <li>Claim → System: 查询用户信息</li>
+                        <li>Claim → Notify: 发送理赔通知</li>
+                        <li>Notify → 短信 API: 发送短信</li>
+                        <li>Claim → Gateway: 返回申请结果</li>
+                    </ol>
+                </div>
+
+                <!-- 活动参与流程 -->
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                    <h3 style="color: #f59e0b; margin-bottom: 15px;">🎁 活动参与流程</h3>
+                    <ol style="padding-left: 20px; color: #94a3b8; line-height: 2;">
+                        <li>用户 → Gateway: 参与活动请求</li>
+                        <li>Gateway → Activity: 转发活动请求</li>
+                        <li>Activity → Redis: 检查参与资格 (限流)</li>
+                        <li>Activity → MySQL: 记录参与信息</li>
+                        <li>Activity → Notify: 发送活动通知</li>
+                        <li>Notify → 短信 API: 发送短信</li>
+                        <li>Activity → Gateway: 返回参与结果</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- 技术说明 -->
+        <div class="info-panel" style="margin-top: 40px;">
+            <h2 style="color: #f59e0b; margin-bottom: 20px;">⚙️ 技术实现说明</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">服务间调用</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 2;">
+                        <li>使用 <strong style="color: #10b981;">Spring Cloud OpenFeign</strong> 进行服务调用</li>
+                        <li>支持负载均衡和熔断降级</li>
+                        <li>声明式 API 调用，代码简洁</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">服务注册与发现</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 2;">
+                        <li>使用 <strong style="color: #10b981;">Nacos</strong> 作为注册中心</li>
+                        <li>服务启动时自动注册</li>
+                        <li>支持服务健康检查和自动摘除</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">配置管理</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 2;">
+                        <li>使用 <strong style="color: #10b981;">Nacos Config</strong> 统一管理配置</li>
+                        <li>支持配置热更新</li>
+                        <li>通过 Namespace 实现环境隔离</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">认证鉴权</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 2;">
+                        <li>使用 <strong style="color: #10b981;">JWT</strong> 进行身份认证</li>
+                        <li>Gateway 统一鉴权</li>
+                        <li>服务间调用传递用户上下文</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">限流降级</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 2;">
+                        <li>使用 <strong style="color: #10b981;">Redis + Lua</strong> 实现限流</li>
+                        <li>Gateway 层全局限流</li>
+                        <li>支持服务降级和熔断</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">日志追踪</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 2;">
+                        <li>使用 <strong style="color: #10b981;">Sleuth + Zipkin</strong> 实现链路追踪</li>
+                        <li>每个请求生成唯一 TraceID</li>
+                        <li>便于问题排查和性能分析</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
