@@ -67,6 +67,13 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Spring Cloud Bootstrap (Spring Boot 3.x 需要) -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-bootstrap</artifactId>
+                <version>${spring-cloud.version}</version>
+            </dependency>
+
             <!-- Database -->
             <dependency>
                 <groupId>com.mysql</groupId>
