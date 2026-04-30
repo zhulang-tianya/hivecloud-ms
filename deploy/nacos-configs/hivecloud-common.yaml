@@ -1,0 +1,23 @@
+# HiveCloud 公共配置
+# Data ID: hivecloud-common.yaml
+# Group: DEFAULT_GROUP
+
+# Redis 配置
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+    timeout: 5000ms
+
+# 通用配置
+common:
+  charset: UTF-8
+  token-expire-time: 7200

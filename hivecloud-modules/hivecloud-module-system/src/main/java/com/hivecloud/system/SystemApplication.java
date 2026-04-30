@@ -1,11 +1,12 @@
-package com.hivecloud.gateway;
+package com.hivecloud.system;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
- * 网关服务启动类
+ * 系统管理模块启动类
  * 启用 Nacos 服务发现
  *
  * @author HiveCloud Team
@@ -13,14 +14,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
-public class GatewayApplication {
+@MapperScan("com.hivecloud.system.mapper")
+public class SystemApplication {
 
-    /**
-     * 主方法，启动 Spring Boot 应用
-     *
-     * @param args 命令行参数
-     */
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(SystemApplication.class, args);
     }
 }

@@ -1,0 +1,21 @@
+# HiveCloud Gateway 配置
+# Data ID: hivecloud-gateway.yaml
+# Group: DEFAULT_GROUP
+
+# Gateway 专属配置
+hivecloud:
+  gateway:
+    jwt:
+      secret: hivecloud-secret-key-must-be-at-least-32-chars-long-for-security
+      token-expire-time: 7200
+    ratelimit:
+      enabled: true
+      requests-per-second: 100
+      burst-capacity: 200
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.hivecloud.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG

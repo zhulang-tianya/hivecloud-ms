@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: hivecloud-gateway
+  cloud:
+    nacos:
+      # Nacos 服务注册中心配置
+      discovery:
+        server-addr: 172.10.6.194:8848
+        username: nacos
+        password: nacos
+        namespace: public
+        group: DEFAULT_GROUP
+        register-enabled: true
+        watch-enabled: true
+      
+      # Nacos 配置中心配置
+      config:
+        server-addr: 172.10.6.194:8848
+        username: nacos
+        password: nacos
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        enabled: true
+        refresh-enabled: true
+        shared-configs:
+          - data-id: hivecloud-common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+        extension-configs:
+          - data-id: hivecloud-gateway.yaml
+            group: DEFAULT_GROUP
+            refresh: true
