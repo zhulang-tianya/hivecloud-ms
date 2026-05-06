@@ -3,6 +3,8 @@ spring:
     name: hivecloud-gateway
   profiles:
     active: dev
+  main:
+    web-application-type: reactive
   config:
     import:
       - nacos:hivecloud-common.yaml
