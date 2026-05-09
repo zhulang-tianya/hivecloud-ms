@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hivecloud.system.mapper.SysTenantPackageMapper">
+
+    <resultMap id="SysTenantPackageResult" type="com.hivecloud.system.entity.SysTenantPackage">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="packageCode" column="package_code"/>
+        <result property="description" column="description"/>
+        <result property="maxUserCount" column="max_user_count"/>
+        <result property="maxDeptCount" column="max_dept_count"/>
+        <result property="maxPostCount" column="max_post_count"/>
+        <result property="price" column="price"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="selectTenantPackageVo">
+        SELECT id, name, package_code, description, max_user_count, max_dept_count, max_post_count, price, sort, status, create_time, update_time, deleted
+        FROM sys_tenant_package
+    </sql>
+</mapper>

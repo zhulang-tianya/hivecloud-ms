@@ -42,4 +42,19 @@ public interface SysUserService extends IService<SysUser> {
      * @return 用户角色标识列表
      */
     List<String> getRoles(Long userId);
+
+    /**
+     * 为用户分配角色
+     *
+     * @param userId 用户 ID
+     * @param roleIds 角色 ID 列表
+     */
+    void assignRoles(Long userId, List<Long> roleIds);
+
+    /**
+     * 删除用户的角色关联
+     *
+     * @param userId 用户 ID
+     */
+    void removeUserRoles(Long userId);
 }

@@ -8,17 +8,17 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 系统菜单实体类（多租户版本）
- * 对应数据库表 sys_menu
- * 存储菜单权限信息
+ * 租户实体类
+ * 对应数据库表 sys_tenant
+ * 存储租户基本信息
  *
  * @author HiveCloud Team
  * @date 2026-05-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("sys_menu")
-public class SysMenu implements Serializable {
+@TableName("sys_tenant")
+public class SysTenant implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,69 +29,39 @@ public class SysMenu implements Serializable {
     private Long id;
 
     /**
-     * 租户 ID
+     * 租户名称
      */
-    private Long tenantId;
+    private String name;
 
     /**
-     * 父菜单 ID
+     * 租户编码
      */
-    private Long parentId;
+    private String tenantCode;
 
     /**
-     * 祖级列表
+     * 联系人姓名
      */
-    private String ancestors;
+    private String contactName;
 
     /**
-     * 菜单名称
+     * 联系电话
      */
-    private String menuName;
+    private String contactPhone;
 
     /**
-     * 菜单编码
+     * 联系邮箱
      */
-    private String menuCode;
-
-    /**
-     * 路由路径
-     */
-    private String path;
-
-    /**
-     * 组件路径
-     */
-    private String component;
-
-    /**
-     * 菜单类型（0-目录 1-菜单 2-按钮）
-     */
-    private Integer menuType;
-
-    /**
-     * 权限标识
-     */
-    private String perms;
-
-    /**
-     * 菜单图标
-     */
-    private String icon;
-
-    /**
-     * 排序
-     */
-    private Integer sort;
-
-    /**
-     * 是否可见（0-隐藏，1-显示）
-     */
-    private Integer visible;
+    private String contactEmail;
 
     /**
      * 状态（0-禁用，1-正常）
      */
     private Integer status;
+
+    /**
+     * 过期时间
+     */
+    private LocalDateTime expireTime;
 
     /**
      * 备注

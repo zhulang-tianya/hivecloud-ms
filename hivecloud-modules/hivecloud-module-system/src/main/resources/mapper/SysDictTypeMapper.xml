@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hivecloud.system.mapper.SysDictTypeMapper">
+
+    <resultMap id="SysDictTypeResult" type="com.hivecloud.system.entity.SysDictType">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="dictType" column="dict_type"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="selectDictTypeVo">
+        SELECT id, tenant_id, dict_name, dict_type, status, remark, create_time, update_time, deleted
+        FROM sys_dict_type
+    </sql>
+</mapper>

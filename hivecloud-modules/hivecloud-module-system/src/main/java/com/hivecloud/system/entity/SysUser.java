@@ -2,26 +2,24 @@ package com.hivecloud.system.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 系统用户实体类
+ * 系统用户实体类（多租户版本）
  * 对应数据库表 sys_user
  * 存储用户基本信息
  *
  * @author HiveCloud Team
- * @date 2026-04-25
- * @see TableName
+ * @date 2026-05-09
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @TableName("sys_user")
 public class SysUser implements Serializable {
 
-    /**
-     * 序列化版本号
-     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -29,6 +27,16 @@ public class SysUser implements Serializable {
      */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
+
+    /**
+     * 租户 ID
+     */
+    private Long tenantId;
+
+    /**
+     * 部门 ID
+     */
+    private Long deptId;
 
     /**
      * 用户名
@@ -69,6 +77,11 @@ public class SysUser implements Serializable {
      * 状态（0-禁用，1-正常）
      */
     private Integer status;
+
+    /**
+     * 密码过期时间
+     */
+    private LocalDateTime passwordExpireTime;
 
     /**
      * 创建时间

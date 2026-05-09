@@ -2,26 +2,24 @@ package com.hivecloud.system.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 系统角色实体类
+ * 系统角色实体类（多租户版本）
  * 对应数据库表 sys_role
  * 存储角色基本信息
  *
  * @author HiveCloud Team
- * @date 2026-04-25
- * @see TableName
+ * @date 2026-05-09
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @TableName("sys_role")
 public class SysRole implements Serializable {
 
-    /**
-     * 序列化版本号
-     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -29,6 +27,11 @@ public class SysRole implements Serializable {
      */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
+
+    /**
+     * 租户 ID
+     */
+    private Long tenantId;
 
     /**
      * 角色编码
@@ -44,6 +47,21 @@ public class SysRole implements Serializable {
      * 角色描述
      */
     private String description;
+
+    /**
+     * 数据范围（1-全部 2-本部门及以下 3-仅本部门 4-仅本人 5-自定义）
+     */
+    private Integer dataScope;
+
+    /**
+     * 自定义部门 ID 集合（逗号分隔）
+     */
+    private String dataScopeDeptIds;
+
+    /**
+     * 显示顺序
+     */
+    private Integer sort;
 
     /**
      * 角色状态（0-禁用，1-正常）

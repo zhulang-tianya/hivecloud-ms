@@ -8,22 +8,22 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 系统菜单实体类（多租户版本）
- * 对应数据库表 sys_menu
- * 存储菜单权限信息
+ * 岗位实体类
+ * 对应数据库表 sys_post
+ * 存储岗位信息
  *
  * @author HiveCloud Team
  * @date 2026-05-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("sys_menu")
-public class SysMenu implements Serializable {
+@TableName("sys_post")
+public class SysPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键 ID，使用雪花算法生成
+     * 岗位 ID，使用雪花算法生成
      */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
@@ -34,59 +34,19 @@ public class SysMenu implements Serializable {
     private Long tenantId;
 
     /**
-     * 父菜单 ID
+     * 岗位编码
      */
-    private Long parentId;
+    private String postCode;
 
     /**
-     * 祖级列表
+     * 岗位名称
      */
-    private String ancestors;
+    private String postName;
 
     /**
-     * 菜单名称
-     */
-    private String menuName;
-
-    /**
-     * 菜单编码
-     */
-    private String menuCode;
-
-    /**
-     * 路由路径
-     */
-    private String path;
-
-    /**
-     * 组件路径
-     */
-    private String component;
-
-    /**
-     * 菜单类型（0-目录 1-菜单 2-按钮）
-     */
-    private Integer menuType;
-
-    /**
-     * 权限标识
-     */
-    private String perms;
-
-    /**
-     * 菜单图标
-     */
-    private String icon;
-
-    /**
-     * 排序
+     * 显示顺序
      */
     private Integer sort;
-
-    /**
-     * 是否可见（0-隐藏，1-显示）
-     */
-    private Integer visible;
 
     /**
      * 状态（0-禁用，1-正常）

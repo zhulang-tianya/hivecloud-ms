@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiveCloud 项目架构图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .architecture-layer {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid #475569;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .layer-title {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #0f172a;
+            padding: 0 10px;
+            color: #94a3b8;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .layer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .component {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 2px solid #64748b;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .component:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: #38bdf8;
+        }
+
+        .component-name {
+            color: #38bdf8;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .component-desc {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .layer-1 .component { border-color: #06b6d4; }
+        .layer-1 .component-name { color: #22d3ee; }
+
+        .layer-2 .component { border-color: #10b981; }
+        .layer-2 .component-name { color: #34d399; }
+
+        .layer-3 .component { border-color: #8b5cf6; }
+        .layer-3 .component-name { color: #a78bfa; }
+
+        .layer-4 .component { border-color: #f59e0b; }
+        .layer-4 .component-name { color: #fbbf24; }
+
+        .layer-5 .component { border-color: #f43f5e; }
+        .layer-5 .component-name { color: #fb7185; }
+
+        .arrow-down {
+            text-align: center;
+            margin: 0.5rem 0;
+            color: #64748b;
+            font-size: 1.5rem;
+        }
+
+        .legend {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid #475569;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .legend-title {
+            color: #38bdf8;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-text {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 2px solid #64748b;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #38bdf8;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .module-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 2px solid #64748b;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #475569;
+        }
+
+        .module-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .module-title {
+            color: #e2e8f0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .module-list {
+            list-style: none;
+        }
+
+        .module-list li {
+            color: #94a3b8;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .module-list li:last-child {
+            border-bottom: none;
+        }
+
+        .module-list li::before {
+            content: "▸";
+            color: #38bdf8;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .tag-core { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+        .tag-business { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .tag-plugin { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+        .tag-common { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .layer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏗️ HiveCloud 项目架构图</h1>
+        <p class="subtitle">企业级微服务架构 · 模块化单体设计 · 插件化扩展</p>
+
+        <!-- 统计卡片 -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">38</div>
+                <div class="stat-label">Maven 模块</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3000+</div>
+                <div class="stat-label">代码行数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">25+</div>
+                <div class="stat-label">文档数量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">核心类</div>
+            </div>
+        </div>
+
+        <!-- L1: 双模流量接入层 -->
+        <div class="architecture-layer layer-1">
+            <div class="layer-title">L1: 双模流量接入层</div>
+            <div class="layer-content">
+                <div class="component">
+                    <div class="component-name">🚪 hivecloud-gateway</div>
+                    <div class="component-desc">
+                        统一业务网关<br>
+                        • 路由转发<br>
+                        • JWT 认证鉴权<br>
+                        • 限流过滤
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">🔗 hivecloud-direct-connector</div>
+                    <div class="component-desc">
+                        域内直连通道<br>
+                        • 服务间直接调用<br>
+                        • 降低网络开销<br>
+                        • 内部通信优化
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇</div>
+
+        <!-- L2: 轻量中心化服务治理层 -->
+        <div class="architecture-layer layer-2">
+            <div class="layer-title">L2: 轻量中心化服务治理层</div>
+            <div class="layer-content">
+                <div class="component">
+                    <div class="component-name">📋 hivecloud-service-registry</div>
+                    <div class="component-desc">
+                        服务注册与发现<br>
+                        • Redis 中心化存储<br>
+                        • 元数据管理<br>
+                        • 服务实例注册
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">💓 hivecloud-heartbeat</div>
+                    <div class="component-desc">
+                        心跳探测机制<br>
+                        • 1 秒间隔推送<br>
+                        • 30 秒 TTL<br>
+                        • 健康检查
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">🔄 hivecloud-gossip-sync</div>
+                    <div class="component-desc">
+                        Gossip 集群同步<br>
+                        • 去中心化同步<br>
+                        • 邻居选择算法<br>
+                        • 最终一致性
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">🛡️ hivecloud-fault-removal</div>
+                    <div class="component-desc">
+                        故障剔除机制<br>
+                        • 连续失败检测<br>
+                        • 超时检测<br>
+                        • 健康检查三重机制
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇</div>
+
+        <!-- L3: 业务内核运行层 -->
+        <div class="architecture-layer layer-3">
+            <div class="layer-title">L3: 业务内核运行层（模块化单体 + 插件引擎）</div>
+            
+            <h3 style="color: #a78bfa; margin: 1rem 0 0.5rem 0;">📦 业务模块 (hivecloud-modules)</h3>
+            <div class="module-grid">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(6, 182, 212, 0.2);">⚙️</div>
+                        <div class="module-title">hivecloud-module-system</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>用户管理</li>
+                        <li>角色权限</li>
+                        <li>组织机构</li>
+                        <li>字典管理</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(16, 185, 129, 0.2);">💰</div>
+                        <div class="module-title">hivecloud-module-payment</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>支付宝支付</li>
+                        <li>微信支付</li>
+                        <li>银联支付</li>
+                        <li>退款管理</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(139, 92, 246, 0.2);">📋</div>
+                        <div class="module-title">hivecloud-module-claim</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>理赔申请</li>
+                        <li>理赔审核</li>
+                        <li>理赔打款</li>
+                        <li>状态跟踪</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(245, 158, 11, 0.2);">🎁</div>
+                        <div class="module-title">hivecloud-module-activity</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>优惠券管理</li>
+                        <li>活动管理</li>
+                        <li>营销工具</li>
+                        <li>数据统计</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(244, 63, 94, 0.2);">📢</div>
+                        <div class="module-title">hivecloud-module-notify</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>短信通知</li>
+                        <li>邮件通知</li>
+                        <li>推送通知</li>
+                        <li>模板管理</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="color: #a78bfa; margin: 1rem 0 0.5rem 0;">🔌 插件引擎 (hivecloud-plugins)</h3>
+            <div class="module-grid">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(6, 182, 212, 0.2);">🔐</div>
+                        <div class="module-title">hivecloud-plugin-auth</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>JWT 认证</li>
+                        <li>权限校验</li>
+                        <li>Token 管理</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(16, 185, 129, 0.2);">⚡</div>
+                        <div class="module-title">hivecloud-plugin-cache</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>Caffeine 本地缓存</li>
+                        <li>Redis 分布式缓存</li>
+                        <li>多级缓存</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(139, 92, 246, 0.2);">🔒</div>
+                        <div class="module-title">hivecloud-plugin-encrypt</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>AES 加密</li>
+                        <li>MD5 哈希</li>
+                        <li>SHA256 哈希</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(245, 158, 11, 0.2);">💬</div>
+                        <div class="module-title">hivecloud-plugin-message</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>站内消息</li>
+                        <li>消息推送</li>
+                        <li>消息模板</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(244, 63, 94, 0.2);">🤖</div>
+                        <div class="module-title">hivecloud-plugin-ai</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>智能客服</li>
+                        <li>自动问答</li>
+                        <li>意图识别</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: rgba(6, 182, 212, 0.2);">📄</div>
+                        <div class="module-title">hivecloud-plugin-file</div>
+                    </div>
+                    <ul class="module-list">
+                        <li>文件上传</li>
+                        <li>文件存储</li>
+                        <li>文件管理</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇</div>
+
+        <!-- L4: 数据自治管理层 -->
+        <div class="architecture-layer layer-4">
+            <div class="layer-title">L4: 数据自治管理层</div>
+            <div class="layer-content">
+                <div class="component">
+                    <div class="component-name">⚡ Caffeine</div>
+                    <div class="component-desc">
+                        本地缓存<br>
+                        • 高性能<br>
+                        • 支持 TTL<br>
+                        • 统计功能
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">🔴 Redis</div>
+                    <div class="component-desc">
+                        分布式缓存<br>
+                        • 数据结构丰富<br>
+                        • 持久化支持<br>
+                        • 集群部署
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">🐬 MySQL 8.0</div>
+                    <div class="component-desc">
+                        关系型数据库<br>
+                        • 主从复制<br>
+                        • 事务支持<br>
+                        • 索引优化
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇</div>
+
+        <!-- L5: 基础底座层 -->
+        <div class="architecture-layer layer-5">
+            <div class="layer-title">L5: 基础底座层</div>
+            <div class="layer-content">
+                <div class="component">
+                    <div class="component-name">📝 Nacos</div>
+                    <div class="component-desc">
+                        配置中心 + 服务发现<br>
+                        • 动态配置<br>
+                        • 热更新<br>
+                        • 服务注册
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">🛡️ Spring Security + JWT</div>
+                    <div class="component-desc">
+                        认证授权<br>
+                        • JWT Token<br>
+                        • RBAC 权限<br>
+                        • BCrypt 加密
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">📊 Prometheus + Grafana</div>
+                    <div class="component-desc">
+                        监控告警<br>
+                        • 指标采集<br>
+                        • 可视化大盘<br>
+                        • 告警规则
+                    </div>
+                </div>
+                <div class="component">
+                    <div class="component-name">📜 Logback</div>
+                    <div class="component-desc">
+                        日志系统<br>
+                        • 统一格式<br>
+                        • 分级日志<br>
+                        • 异步输出
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-title">🎨 颜色图例</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #06b6d4;"></div>
+                    <div class="legend-text">L1: 流量接入层</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <div class="legend-text">L2: 服务治理层</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #8b5cf6;"></div>
+                    <div class="legend-text">L3: 业务内核层</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f59e0b;"></div>
+                    <div class="legend-text">L4: 数据管理层</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f43f5e;"></div>
+                    <div class="legend-text">L5: 基础底座层</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 技术栈 -->
+        <div class="legend" style="margin-top: 2rem;">
+            <div class="legend-title">🛠️ 核心技术栈</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">Spring Boot 3.2.4</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">Spring Cloud 2023.0.1</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">MyBatis-Plus 3.5.5</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">MySQL 8.0.33</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">Redis 6.0+</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">Nacos 2023.0.1.0</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">Caffeine 3.1.8</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #64748b;"></div>
+                    <div class="legend-text">Prometheus + Grafana</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

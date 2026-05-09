@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hivecloud.system.mapper.SysRoleMapper">
+
+    <resultMap id="SysRoleResult" type="com.hivecloud.system.entity.SysRole">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="dataScope" column="data_scope"/>
+        <result property="dataScopeDeptIds" column="data_scope_dept_ids"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="selectRoleVo">
+        SELECT id, tenant_id, role_code, role_name, data_scope, data_scope_dept_ids, sort, status, remark, create_time, update_time, deleted
+        FROM sys_role
+    </sql>
+</mapper>

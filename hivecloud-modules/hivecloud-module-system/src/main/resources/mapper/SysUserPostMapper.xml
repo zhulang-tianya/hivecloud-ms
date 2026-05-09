@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hivecloud.system.mapper.SysUserPostMapper">
+
+    <resultMap id="SysUserPostResult" type="com.hivecloud.system.entity.SysUserPost">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="postId" column="post_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectUserPostVo">
+        SELECT id, tenant_id, user_id, post_id, create_time
+        FROM sys_user_post
+    </sql>
+</mapper>

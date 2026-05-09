@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hivecloud.system.mapper.SysMenuMapper">
+
+    <resultMap id="SysMenuResult" type="com.hivecloud.system.entity.SysMenu">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="ancestors" column="ancestors"/>
+        <result property="menuName" column="menu_name"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="menuType" column="menu_type"/>
+        <result property="path" column="path"/>
+        <result property="component" column="component"/>
+        <result property="perms" column="perms"/>
+        <result property="icon" column="icon"/>
+        <result property="sort" column="sort"/>
+        <result property="visible" column="visible"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="selectMenuVo">
+        SELECT id, tenant_id, parent_id, ancestors, menu_name, menu_code, menu_type, path, component, perms, icon, sort, visible, status, create_time, update_time, deleted
+        FROM sys_menu
+    </sql>
+</mapper>
