@@ -1,0 +1,2 @@
+com.hivecloud.common.redis.config.RedisConfigValidator
+com.hivecloud.common.redis.config.RedisConnectionFactoryConfig

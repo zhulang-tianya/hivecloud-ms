@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: hivecloud-system
+  cloud:
+    nacos:
+      config:
+        server-addr: 172.40.2.65:8848
+        username: nacos
+        password: nacos
+        namespace: cafc6120-cc05-485f-933b-cd9ba227014d
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        shared-configs:
+          - data-id: hivecloud-common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+        extension-configs:
+          - data-id: hivecloud-system.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+      discovery:
+        server-addr: 172.40.2.65:8848
+        username: nacos
+        password: nacos
+        namespace: cafc6120-cc05-485f-933b-cd9ba227014d
+        group: DEFAULT_GROUP

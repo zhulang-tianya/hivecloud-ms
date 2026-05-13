@@ -5,17 +5,33 @@
 # Redis 配置
 spring:
   redis:
-    host: localhost
+    host: 172.40.2.66
     port: 6379
-    password: 
-    database: 0
+    password: redis654321
+    database: 3
+    # 连接超时配置
+    timeout: 5000ms
+    # Lettuce 连接池优化配置
     lettuce:
       pool:
-        max-active: 8
-        max-wait: -1ms
-        max-idle: 8
-        min-idle: 0
-    timeout: 5000ms
+        # 最大活跃连接数（根据并发量调整，生产环境建议 20-50）
+        max-active: 20
+        # 最大阻塞等待时间（-1 表示无限等待，建议设置合理值避免长时间阻塞）
+        max-wait: 3000ms
+        # 最大空闲连接数（保持一定空闲连接，提高响应速度）
+        max-idle: 10
+        # 最小空闲连接数（启动时预创建连接，避免冷启动慢）
+        min-idle: 5
+        # 连接空闲检测时间（毫秒）
+        time-between-eviction-runs: 60000ms
+        # 连接最小空闲时间（毫秒）
+        min-evictable-idle-time: 1800000ms
+        # 获取连接时是否检测有效性
+        test-on-borrow: false
+        # 归还连接时是否检测有效性
+        test-on-return: false
+        # 空闲连接检测是否启用
+        test-while-idle: true
 
 # 通用配置
 common:

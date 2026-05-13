@@ -3,40 +3,6 @@ spring:
     name: hivecloud-system
   profiles:
     active: dev
-  config:
-    import:
-      - nacos:hivecloud-common.yaml
-      - nacos:hivecloud-system.yaml
-  cloud:
-    nacos:
-      # Nacos 服务注册中心配置
-      discovery:
-        server-addr: ${nacos.server-addr}
-        username: ${nacos.username}
-        password: ${nacos.password}
-        namespace: ${nacos.namespace}
-        group: ${nacos.group}
-        register-enabled: true
-        watch-enabled: true
-      
-      # Nacos 配置中心配置
-      config:
-        server-addr: ${nacos.server-addr}
-        username: ${nacos.username}
-        password: ${nacos.password}
-        namespace: ${nacos.namespace}
-        group: ${nacos.group}
-        file-extension: yaml
-        enabled: true
-        refresh-enabled: true
-        shared-configs:
-          - data-id: hivecloud-common.yaml
-            group: ${nacos.group}
-            refresh: true
-        extension-configs:
-          - data-id: hivecloud-system.yaml
-            group: ${nacos.group}
-            refresh: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/hivecloud_system?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
@@ -48,6 +14,8 @@ spring:
       idle-timeout: 30000
       connection-timeout: 30000
       max-lifetime: 1800000
+  # Redis 配置已迁移到 Nacos 配置中心 (hivecloud-common.yaml)
+  # 本地不再配置 Redis，完全依赖 Nacos 配置
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml

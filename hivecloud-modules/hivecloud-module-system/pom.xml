@@ -27,7 +27,13 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-        
+
+        <!-- Spring Cloud Bootstrap（Spring Cloud 2023.x 需显式启用） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.hivecloud</groupId>
             <artifactId>hivecloud-common-core</artifactId>
@@ -75,11 +81,11 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- EasyCaptcha - 验证码 -->
+        <!-- Hutool Captcha - 验证码（替代 EasyCaptcha，兼容 Java 17） -->
         <dependency>
-            <groupId>com.github.whvcse</groupId>
-            <artifactId>easy-captcha</artifactId>
-            <version>1.6.2</version>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-captcha</artifactId>
+            <version>5.8.18</version>
         </dependency>
         
         <!-- JJWT - JWT Token -->
@@ -144,6 +150,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.hivecloud.system.SystemApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

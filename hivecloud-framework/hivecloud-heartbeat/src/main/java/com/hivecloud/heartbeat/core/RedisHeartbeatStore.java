@@ -1,5 +1,6 @@
 package com.hivecloud.heartbeat.core;
 
+import com.hivecloud.common.redis.util.RedisKeyBuilder;
 import com.hivecloud.heartbeat.model.HeartbeatInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,24 +24,6 @@ import java.util.concurrent.TimeUnit;
 public class RedisHeartbeatStore implements HeartbeatStore {
 
     /**
-     * Redis Key 前缀：心跳检测模块
-     * 统一使用 hivecloud:heartbeat: 前缀
-     */
-    private static final String HEARTBEAT_PREFIX = "hivecloud:heartbeat:";
-    
-    /**
-     * 心跳 Key 模板
-     * 格式：hivecloud:heartbeat:{instanceId}
-     */
-    private static final String HEARTBEAT_KEY_TEMPLATE = HEARTBEAT_PREFIX + "{instanceId}";
-    
-    /**
-     * 心跳 Key 前缀（用于 exists 方法）
-     * 格式：hivecloud:heartbeat:
-     */
-    private static final String HEARTBEAT_KEY_PREFIX = HEARTBEAT_PREFIX;
-
-    /**
      * 心跳过期时间（秒），默认 30 秒
      * 超过 30 秒未更新心跳的实例将被视为故障
      */
@@ -53,12 +36,14 @@ public class RedisHeartbeatStore implements HeartbeatStore {
 
     /**
      * 构建心跳 Key
+     * 使用 RedisKeyBuilder 统一构建 Key
+     * 格式：hivecloud:heartbeat:{instanceId}
      *
      * @param instanceId 实例 ID
      * @return 格式化的 Key
      */
     private String buildHeartbeatKey(String instanceId) {
-        return HEARTBEAT_KEY_TEMPLATE.replace("{instanceId}", instanceId);
+        return RedisKeyBuilder.heartbeat(instanceId);
     }
 
     /**
@@ -109,7 +94,7 @@ public class RedisHeartbeatStore implements HeartbeatStore {
      */
     @Override
     public boolean exists(String instanceId) {
-        String key = HEARTBEAT_KEY_PREFIX + instanceId;
+        String key = buildHeartbeatKey(instanceId);
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 }

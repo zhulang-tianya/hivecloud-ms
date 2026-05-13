@@ -1,5 +1,6 @@
 package com.hivecloud.registry.service;
 
+import com.hivecloud.common.redis.util.RedisKeyBuilder;
 import com.hivecloud.registry.constant.ServiceStatus;
 import com.hivecloud.registry.model.ServiceInstance;
 import lombok.RequiredArgsConstructor;
@@ -26,55 +27,43 @@ import java.util.stream.Collectors;
 public class RedisServiceRegistry implements ServiceRegistry {
 
     /**
-     * Redis Key 前缀：服务注册与发现模块
-     * 统一使用 hivecloud:registry: 前缀
-     */
-    private static final String REGISTRY_PREFIX = "hivecloud:registry:";
-    
-    /**
-     * 服务元数据 Key 模板
-     * 格式：hivecloud:registry:meta:{serviceId}:{instanceId}
-     */
-    private static final String SERVICE_META_KEY_TEMPLATE = REGISTRY_PREFIX + "meta:{serviceId}:{instanceId}";
-    
-    /**
-     * 服务集合 Key 模板
-     * 格式：hivecloud:registry:set:{serviceId}
-     */
-    private static final String SERVICE_SET_KEY_TEMPLATE = REGISTRY_PREFIX + "set:{serviceId}";
-    
-    /**
-     * 全局服务集合 Key
-     * 格式：hivecloud:registry:set
-     */
-    private static final String GLOBAL_SERVICE_SET_KEY = REGISTRY_PREFIX + "set";
-
-    /**
      * Redis 模板，用于操作 Redis 存储
      */
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 构建服务元数据 Key
+     * 使用 RedisKeyBuilder 统一构建 Key
+     * 格式：hivecloud:registry:meta:{serviceId}:{instanceId}
      *
      * @param serviceId 服务 ID
      * @param instanceId 实例 ID
      * @return 格式化的 Key
      */
     private String buildServiceMetaKey(String serviceId, String instanceId) {
-        return SERVICE_META_KEY_TEMPLATE
-                .replace("{serviceId}", serviceId)
-                .replace("{instanceId}", instanceId);
+        return RedisKeyBuilder.registry(serviceId, instanceId);
     }
 
     /**
      * 构建服务集合 Key
+     * 使用 RedisKeyBuilder 统一构建 Key
+     * 格式：hivecloud:registry:set:{serviceId}
      *
      * @param serviceId 服务 ID
      * @return 格式化的 Key
      */
     private String buildServiceSetKey(String serviceId) {
-        return SERVICE_SET_KEY_TEMPLATE.replace("{serviceId}", serviceId);
+        return RedisKeyBuilder.registrySet(serviceId);
+    }
+    
+    /**
+     * 构建全局服务集合 Key
+     * 格式：hivecloud:registry:set
+     *
+     * @return 全局服务集合 Key
+     */
+    private String buildGlobalServiceSetKey() {
+        return "hivecloud:registry:set";
     }
 
     /**
@@ -87,13 +76,14 @@ public class RedisServiceRegistry implements ServiceRegistry {
     public void register(ServiceInstance instance) {
         String metaKey = buildServiceMetaKey(instance.getServiceId(), instance.getInstanceId());
         String setKey = buildServiceSetKey(instance.getServiceId());
+        String globalSetKey = buildGlobalServiceSetKey();
         instance.setRegisterTime(System.currentTimeMillis());
         instance.setLastHeartbeatTime(System.currentTimeMillis());
         instance.setStatus(ServiceStatus.UP);
         redisTemplate.opsForValue().set(metaKey, instance);
         redisTemplate.opsForSet().add(setKey, instance.getInstanceId());
-        redisTemplate.opsForSet().add(GLOBAL_SERVICE_SET_KEY, instance.getServiceId());
-        log.info("Service registered: {} ({})", instance.getServiceId(), instance.getInstanceId());
+        redisTemplate.opsForSet().add(globalSetKey, instance.getServiceId());
+        log.info("Service registered: {} ({}), key={}", instance.getServiceId(), instance.getInstanceId(), metaKey);
     }
 
     /**
@@ -111,7 +101,7 @@ public class RedisServiceRegistry implements ServiceRegistry {
         redisTemplate.opsForSet().remove(setKey, instanceId);
         Long size = redisTemplate.opsForSet().size(setKey);
         if (size == null || size == 0) {
-            redisTemplate.opsForSet().remove(GLOBAL_SERVICE_SET_KEY, serviceId);
+            redisTemplate.opsForSet().remove(buildGlobalServiceSetKey(), serviceId);
         }
         log.info("Service deregistered: {} ({})", serviceId, instanceId);
     }
@@ -174,7 +164,7 @@ public class RedisServiceRegistry implements ServiceRegistry {
      */
     @Override
     public List<String> getServiceNames() {
-        Set<Object> members = redisTemplate.opsForSet().members(GLOBAL_SERVICE_SET_KEY);
+        Set<Object> members = redisTemplate.opsForSet().members(buildGlobalServiceSetKey());
         if (members == null) {
             return Collections.emptyList();
         }
